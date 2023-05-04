@@ -11,7 +11,7 @@ const Home = () => (
       width={0}
       height={0}
       sizes="100vw"
-      style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+      style={{ width: '100%', height: 'auto', objectFit: 'cover', maxHeight: 'calc(100vh - 6rem)' }}
     />
   </>
 );
