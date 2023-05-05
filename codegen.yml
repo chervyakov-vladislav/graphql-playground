@@ -1,0 +1,6 @@
+overwrite: true
+schema: 'https://api.escuelajs.co/graphql'
+generates:
+  ./src/types/types.generated.ts:
+    plugins:
+      - typescript
