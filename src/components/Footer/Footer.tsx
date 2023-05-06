@@ -25,7 +25,7 @@ const teamData: ITeamData[] = [
 
 export const Footer = (): JSX.Element => {
   return (
-    <footer className="font-semibold text-[14px] h-[141px] grid-cols-[minmax(45%,70%)_30%] pl-[2%] pr-[2%] md:h-12 grid md:grid-cols-[minmax(45%,auto)_10%_1fr] items-center bg-color-dark-purple text-white">
+    <footer className="font-semibold text-[14px] h-[141px] grid-cols-[minmax(45%,70%)_30%] pl-[2%] pr-[2%] md:h-12 grid md:grid-cols-[minmax(45%,auto)_10%_1fr] items-center bg-color-dark-purple text-white z-10">
       <FooterSocials data={teamData} />
       <p className="flex justify-center row-start-2 md:row-start-auto">2023</p>
       <div className="flex justify-center md:justify-end">

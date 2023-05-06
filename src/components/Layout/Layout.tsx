@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
+import { ParticlesBackground } from '@/components/ui/ParticlesBackground/ParticlesBackground';
 
 interface IProps {
   children: JSX.Element | JSX.Element[];
@@ -9,6 +10,7 @@ interface IProps {
 const Layout = ({ children }: IProps) => (
   <div className="flex min-h-screen flex-col p-0">
     <Header />
+    <ParticlesBackground />
     <main className="grow flex">{children}</main>
     <Footer />
   </div>
