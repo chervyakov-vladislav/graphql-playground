@@ -1,5 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  corePlugins: {
+    preflight: false,
+  },
+  important: '#__next',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -20,6 +24,9 @@ module.exports = {
         'color-border-dark-purple': '#361e9a',
         'color-hover-button-purple': '#311C87',
         'color-dark-blue-hover': '#003D5B',
+        'color-heading-border': '#DEE2E7',
+        'color-documentation-primary': '#191C23',
+        'color-documentation-secondary': '#5A6270',
         'color-light-gray': '#f3f4f6',
         'color-text-bright-red': '#ff6b98',
         'color-text-red': '#d2054e',
@@ -28,6 +35,7 @@ module.exports = {
       },
       fontFamily: {
         SourceSansPro: ['Source Sans Pro', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+        SourceCodePro: ['Source Code Pro', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
       },
     },
   },

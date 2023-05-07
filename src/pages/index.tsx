@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { MainCodeBlock } from '@/components/Main/MainCodeBlock/MainCodeBlock';
 import { MainCodeRequest } from '@/components/Main/MainCodeRequest/MainCodeRequest';

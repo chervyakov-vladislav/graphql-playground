@@ -4,14 +4,22 @@ import { Provider } from 'react-redux';
 import type { AppProps } from 'next/app';
 
 import Layout from '../components/Layout/Layout';
-import { setupStore } from '@/store/store';
+import { wrapper } from '../store/store';
+import { CssBaseline } from '@mui/material';
+import { StyledEngineProvider } from '@mui/material/styles';
 
-export default function App({ Component, pageProps }: AppProps) {
+export function App({ Component, pageProps }: AppProps) {
+  const { store, props } = wrapper.useWrappedStore(pageProps);
   return (
-    <Provider store={setupStore()}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+    <Provider store={store}>
+      <StyledEngineProvider injectFirst>
+        <CssBaseline />
+        <Layout>
+          <Component {...props.pageProps} />
+        </Layout>
+      </StyledEngineProvider>
     </Provider>
   );
 }
+
+export default App;
