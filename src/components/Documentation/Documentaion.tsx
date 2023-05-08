@@ -38,14 +38,16 @@ const Documentaion = () => {
       >
         Documentation
       </Typography>
-      <SchemaNaviagation />
-      <BackButton />
-      <Arguments />
-      <Fields />
-      <Button onClick={handleClick}>Загрузить</Button>
-      <pre className="break-all whitespace-pre-wrap">
-        {data ? JSON.stringify(data, null, '  ') : 'data template'}
-      </pre>
+      <div className="pr-4">
+        <SchemaNaviagation />
+        <BackButton />
+        <Arguments />
+        <Fields />
+        <Button onClick={handleClick}>Загрузить</Button>
+        <pre className="break-all whitespace-pre-wrap">
+          {data ? JSON.stringify(data, null, '  ') : 'data template'}
+        </pre>
+      </div>
     </>
   );
 };

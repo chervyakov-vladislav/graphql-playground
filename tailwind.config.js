@@ -26,6 +26,7 @@ module.exports = {
         'color-dark-blue-hover': '#003D5B',
         'color-heading-border': '#DEE2E7',
         'color-documentation-primary': '#191C23',
+        'color-inactive-tab': '#cad0d8',
         'color-documentation-secondary': '#5A6270',
         'color-light-gray': '#f3f4f6',
         'color-text-bright-red': '#ff6b98',
