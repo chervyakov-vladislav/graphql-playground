@@ -20,8 +20,14 @@ const initialState: PayloadParams = {
     {
       id: 1,
       name: 'ExampleQuery',
-      requestCode: '',
-      responseCode: '',
+      requestCode: 'First',
+      responseCode: 'First',
+    },
+    {
+      id: 2,
+      name: 'ExampleQuery-2',
+      requestCode: 'second',
+      responseCode: 'Second',
     },
   ],
   ids: [1],
