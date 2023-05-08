@@ -23,14 +23,8 @@ const initialState: PayloadParams = {
       requestCode: '',
       responseCode: '',
     },
-    {
-      id: 2,
-      name: 'ExampleQuery',
-      requestCode: '',
-      responseCode: '',
-    },
   ],
-  ids: [0],
+  ids: [1],
   count: 1,
   activeTabId: 1,
 };
@@ -44,17 +38,36 @@ export const editorTabSlice = createSlice({
       while (state.ids.includes(newId)) {
         newId += 1;
       }
-      state.count += 1;
+      state.ids.push(newId);
       state.tabs.push({
         id: newId,
-        name: `Unnamed-${state.count + 1}`,
+        name: `Unnamed-${state.count}`,
         requestCode: '',
         responseCode: '',
       });
+      state.count += 1;
       state.activeTabId = newId;
     },
     setActiveTab: (state, action) => {
       state.activeTabId = action.payload;
+    },
+    deleteTab: (state, action) => {
+      const index = state.tabs.findIndex((item) => item.id == action.payload);
+      console.log(index);
+      if (state.activeTabId == action.payload) {
+        state.activeTabId =
+          index === 1
+            ? state.tabs[1]?.id
+            : state.tabs?.[index + 1]
+            ? state.tabs?.[index + 1]?.id
+            : state.tabs?.[index - 1]?.id
+            ? state.tabs?.[index - 1]?.id
+            : 1;
+      }
+      state.tabs.splice(index, 1);
+      if (state.tabs.length === 0) {
+        state.tabs.push(...initialState.tabs);
+      }
     },
   },
 });

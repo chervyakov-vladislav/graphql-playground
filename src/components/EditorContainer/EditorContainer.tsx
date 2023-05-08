@@ -1,21 +1,26 @@
-import EditorTab from '@/components/ui/EditorTab/EditorTab';
 import React from 'react';
-import { useAppSelector } from '@/hooks/redux';
+import { TabsContainer } from '@/components/Editor/TabsContainer/TabsContainer';
+import { Grid } from '@mui/material';
 
 export const EditorContainer = () => {
-  const { tabs } = useAppSelector((state) => state.editorTab);
-
   return (
     <div className={'pt-12'}>
-      <div className={'border-0 border-b-[1px] border-solid border-color-heading-border'}>
-        <div className={'pl-4'}>
-          <div className={'flex'}>
-            {tabs.map((tab, id) => (
-              <EditorTab name={tab.name} key={id} id={tab.id} />
-            ))}
-          </div>
-        </div>
-      </div>
+      <TabsContainer />
+      <Grid
+        className={'pl-4'}
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="flex-start"
+        spacing={1}
+      >
+        <Grid item sm={6} xs={12}>
+          test
+        </Grid>
+        <Grid item sm={6} xs={12}>
+          test
+        </Grid>
+      </Grid>
     </div>
   );
 };

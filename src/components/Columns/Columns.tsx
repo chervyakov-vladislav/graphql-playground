@@ -15,13 +15,8 @@ const Columns = () => {
       <Grid item sm={4} xs={12} className="flex flex-col pt-12">
         <Documentaion />
       </Grid>
-      <Grid item sm={4} xs={12}>
-        <div>
-          <EditorContainer />
-        </div>
-      </Grid>
-      <Grid item sm={4} xs={12}>
-        <div>response</div>
+      <Grid item sm={8} xs={12}>
+        <EditorContainer />
       </Grid>
     </Grid>
   );
