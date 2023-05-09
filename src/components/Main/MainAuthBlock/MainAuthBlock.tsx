@@ -1,7 +1,30 @@
+import { useAppDispatch } from '@/store/hooks';
+import { authActions } from '@/store/reducers/auth/authSlice';
+import { KindForm } from '@/types/enums';
 import Button from '@mui/material/Button';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 export const MainAuthBlock = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const handleClick = (
+    event: React.KeyboardEvent<HTMLButtonElement> | React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    if (event.target instanceof HTMLButtonElement && event.target.name) {
+      switch (event.target?.name) {
+        case 'login':
+          dispatch(authActions.changeKindOfForm(KindForm.login));
+          break;
+        case 'signin':
+          dispatch(authActions.changeKindOfForm(KindForm.signin));
+          break;
+      }
+      router.push('/auth');
+    }
+  };
+
   return (
     <div>
       <div className={'px-[3.7%]'}>
@@ -16,6 +39,8 @@ export const MainAuthBlock = () => {
       </div>
       <Button
         variant="contained"
+        name="loginin"
+        onClick={handleClick}
         className={
           'bg-color-purple font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-color-border-dark-purple mb-[19px] hover:bg-color-hover-button-purple'
         }
@@ -24,6 +49,8 @@ export const MainAuthBlock = () => {
       </Button>
       <Button
         variant="contained"
+        name="signin"
+        onClick={handleClick}
         className={
           'bg-transparent text-color-bright-black font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-transparent shadow-none hover:border-color-bright-black hover:bg-transparent'
         }
