@@ -29,10 +29,38 @@ export const EditorContainer = () => {
     setIsFocus(false);
   };
 
+  const editorContainerClickEvent = async (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setActiveLine(code.length - 1);
+      setActiveLineSymbol(code[code.length - 1].length);
+    }
+  };
+
+  const lineClickEvent = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    console.log(e.target === e.currentTarget);
+    const line = e.currentTarget.getAttribute('data-line');
+    if (line) {
+      setActiveLine(Number(line));
+    }
+    if (e.target === e.currentTarget) {
+      console.log(line);
+      await setActiveLineSymbol(code[Number(line)].length + 1);
+    }
+  };
+
+  const letterClickEvent = (e: React.MouseEvent) => {
+    const letter = e.currentTarget.getAttribute('data-letter');
+    if (letter) {
+      setActiveLineSymbol(Number(letter) + 1);
+    }
+  };
+
   let height = activeLine * 20;
   let left = activeLineSymbol * 9.7;
   useEffect(() => {
     height = activeLine * 24;
+    console.log(code[activeLine]);
     if (code[activeLine].length < activeLineSymbol) {
       setActiveLineSymbol(code[activeLine].length);
     }
@@ -51,9 +79,7 @@ export const EditorContainer = () => {
 
   const cursorToRight = () => {
     setActiveLineSymbol(
-      activeLineSymbol + 1 > code[activeLine][activeLineSymbol].length
-        ? activeLineSymbol
-        : activeLineSymbol + 1
+      activeLineSymbol + 1 > code[activeLine].length ? activeLineSymbol : activeLineSymbol + 1
     );
   };
 
@@ -175,15 +201,23 @@ export const EditorContainer = () => {
               <EditorHeader />
               <div
                 tabIndex={0}
-                className="text-black min-h-[500px] relative font-SourceCodePro leading-5 outline-0"
+                className="text-black min-h-[500px] h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
                 onFocus={focusEvent}
                 onBlur={blurEvent}
                 onKeyDown={inputEvent}
+                onClick={editorContainerClickEvent}
               >
                 {code.map((item, index) => (
-                  <div className={'min-h-[20px] whitespace-pre cursor-text truncate'} key={index}>
-                    {item.map((element, index) => (
-                      <span key={index}>{element}</span>
+                  <div
+                    className={'min-h-[20px] whitespace-pre cursor-text truncate'}
+                    key={index}
+                    data-line={index}
+                    onClick={lineClickEvent}
+                  >
+                    {item.map((element, indexLetter) => (
+                      <span key={indexLetter} data-letter={indexLetter} onClick={letterClickEvent}>
+                        {element}
+                      </span>
                     ))}
                   </div>
                 ))}
