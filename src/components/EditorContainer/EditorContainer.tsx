@@ -3,9 +3,15 @@ import { TabsContainer } from '@/components/Editor/TabsContainer/TabsContainer';
 import { Button, Grid } from '@mui/material';
 import { useAppSelector } from '@/hooks/redux';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import { EditorHeader } from '@/components/Editor/EditorHeader/EditorHeader';
+import divider from '@/components/Documentation/SchemaNavigation/Divider';
 
 export const EditorContainer = () => {
   const { tabs, activeTabId } = useAppSelector((state) => state.editorTab);
+  const [isFocus, setIsFocus] = useState(false);
+  const [code, setCode] = useState<Array<string>>(['']);
+  const [activeLine, setActiveLine] = useState(0);
+  const [activeLineSymbol, setActiveLineSymbol] = useState(0);
   const [requestCode, setRequestCode] = useState('');
   const [responseCode, setResponseCode] = useState('');
 
@@ -16,6 +22,141 @@ export const EditorContainer = () => {
       setResponseCode(item.responseCode);
     }
   }, [activeTabId]);
+
+  const focusEvent = () => {
+    setIsFocus(true);
+  };
+
+  const blurEvent = () => {
+    setIsFocus(false);
+  };
+
+  let height = activeLine * 20;
+  let left = activeLineSymbol * 9.7;
+  useEffect(() => {
+    height = activeLine * 24;
+    if (code[activeLine].length < activeLineSymbol) {
+      setActiveLineSymbol(code[activeLine].length);
+    }
+  }, [activeLine]);
+  useEffect(() => {
+    left = activeLineSymbol * 9;
+  }, [activeLineSymbol]);
+
+  const cursorToTop = () => {
+    setActiveLine(activeLine - 1 >= 0 ? activeLine - 1 : activeLine);
+  };
+
+  const cursorToDown = () => {
+    setActiveLine(activeLine + 2 > code.length ? activeLine : activeLine + 1);
+  };
+
+  const cursorToRight = () => {
+    setActiveLineSymbol(
+      activeLineSymbol + 1 > code[activeLine].length ? activeLineSymbol : activeLineSymbol + 1
+    );
+  };
+
+  const cursorToLeft = () => {
+    setActiveLineSymbol(activeLineSymbol - 1 >= 0 ? activeLineSymbol - 1 : activeLineSymbol);
+  };
+
+  const toUpOnLastItem = () => {
+    setActiveLineSymbol(code[activeLine].length);
+  };
+
+  const inputEvent = async (e: React.KeyboardEvent) => {
+    if (isFocus) {
+      if (e.key.length === 1) {
+        const newArray = code.map((item, index) => {
+          if (index === activeLine) {
+            const itemArray = item.split('');
+            itemArray.splice(activeLineSymbol, 0, e.key);
+            return itemArray.join('');
+          } else {
+            return item;
+          }
+        });
+        setActiveLineSymbol(activeLineSymbol + 1);
+        setCode(newArray);
+      } else {
+        if (e.key === 'Enter') {
+          let line = '';
+          if (activeLineSymbol < code[activeLine].length) {
+            line = code[activeLine].split('').slice(activeLineSymbol).join('');
+          }
+          console.log(code.slice(activeLine, 0));
+          const newArray = [
+            ...code.slice(0, activeLine),
+            code[activeLine].split('').slice(0, activeLineSymbol).join(''),
+            line,
+            ...code.slice(activeLine + 1),
+          ];
+          console.log(newArray);
+          setCode(newArray);
+          setActiveLineSymbol(0);
+          setActiveLine(activeLine + 1);
+          console.log(code);
+        }
+        if (e.key.includes('Arrow')) {
+          if (e.key === 'ArrowUp') {
+            cursorToTop();
+          }
+          if (e.key === 'ArrowDown') {
+            cursorToDown();
+          }
+          if (e.key === 'ArrowLeft') {
+            cursorToLeft();
+          }
+          if (e.key === 'ArrowRight') {
+            cursorToRight();
+          }
+        }
+        if (e.key === 'Backspace') {
+          if (code[activeLine].length !== 0) {
+            if (activeLineSymbol !== 0) {
+              const newArray = code.map((item, index) => {
+                if (index === activeLine) {
+                  const str = item.split('');
+                  str.splice(activeLineSymbol - 1, 1);
+                  return str.join('');
+                } else {
+                  return item;
+                }
+              });
+              cursorToLeft();
+              setCode(newArray);
+            } else {
+              if (activeLine === 0) {
+                return;
+              }
+
+              const line = code[activeLine];
+              const newArray = code.map((item, index) => {
+                if (index + 1 === activeLine) {
+                  item += line;
+                  return item;
+                }
+                if (index === activeLine) {
+                  return undefined;
+                }
+                return item;
+              });
+              const nArray = newArray.filter((item) => item !== undefined);
+              setCode(nArray as Array<string>);
+              toUpOnLastItem();
+            }
+          } else {
+            const newArray = code.filter((item, index) => index !== activeLine);
+            const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
+            setCode(newArray);
+            setActiveLine(newActiveLine);
+            toUpOnLastItem();
+          }
+        }
+      }
+    }
+  };
 
   return (
     <div className={'pt-12'}>
@@ -31,18 +172,25 @@ export const EditorContainer = () => {
         <Grid item sm={6} xs={12}>
           <div className={'flex mt-[8px] min-h-[78vh] bg-white rounded-lg'}>
             <div className={'p-8 grow'}>
-              <div className="flex font-SourceSansPro justify-between">
-                <h3 className="text-black m-0 p-0">Operation</h3>
-                <Button
-                  sx={{
-                    height: '28px',
-                    textTransform: 'none',
-                  }}
-                  variant="contained"
-                >
-                  <PlayArrowOutlinedIcon />
-                  ExampleQuery
-                </Button>
+              <EditorHeader />
+              <div
+                tabIndex={0}
+                className="text-black min-h-[500px] relative font-SourceCodePro leading-5 outline-0"
+                onFocus={focusEvent}
+                onBlur={blurEvent}
+                onKeyDown={inputEvent}
+              >
+                {code.map((item, index) => (
+                  <div className={'min-h-[20px] whitespace-pre cursor-text truncate'} key={index}>
+                    {item}
+                  </div>
+                ))}
+                <div
+                  className={`absolute h-[24px] w-[2px] bg-black animate-blink-cursor ${
+                    isFocus ? 'visible' : 'hidden'
+                  }`}
+                  style={{ top: `${height}px`, left: `${left}px` }}
+                ></div>
               </div>
             </div>
           </div>
