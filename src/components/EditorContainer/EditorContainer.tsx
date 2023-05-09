@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { TabsContainer } from '@/components/Editor/TabsContainer/TabsContainer';
-import { Button, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import { useAppSelector } from '@/hooks/redux';
-import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import { EditorHeader } from '@/components/Editor/EditorHeader/EditorHeader';
-import divider from '@/components/Documentation/SchemaNavigation/Divider';
 
 export const EditorContainer = () => {
   const { tabs, activeTabId } = useAppSelector((state) => state.editorTab);
   const [isFocus, setIsFocus] = useState(false);
-  const [code, setCode] = useState<Array<string>>(['']);
+  const [code, setCode] = useState<Array<Array<string>>>([['']]);
   const [activeLine, setActiveLine] = useState(0);
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
   const [requestCode, setRequestCode] = useState('');
@@ -53,7 +51,9 @@ export const EditorContainer = () => {
 
   const cursorToRight = () => {
     setActiveLineSymbol(
-      activeLineSymbol + 1 > code[activeLine].length ? activeLineSymbol : activeLineSymbol + 1
+      activeLineSymbol + 1 > code[activeLine][activeLineSymbol].length
+        ? activeLineSymbol
+        : activeLineSymbol + 1
     );
   };
 
@@ -70,9 +70,9 @@ export const EditorContainer = () => {
       if (e.key.length === 1) {
         const newArray = code.map((item, index) => {
           if (index === activeLine) {
-            const itemArray = item.split('');
+            const itemArray = item;
             itemArray.splice(activeLineSymbol, 0, e.key);
-            return itemArray.join('');
+            return itemArray;
           } else {
             return item;
           }
@@ -83,13 +83,13 @@ export const EditorContainer = () => {
         if (e.key === 'Enter') {
           let line = '';
           if (activeLineSymbol < code[activeLine].length) {
-            line = code[activeLine].split('').slice(activeLineSymbol).join('');
+            line = code[activeLine].slice(activeLineSymbol).join('');
           }
           console.log(code.slice(activeLine, 0));
           const newArray = [
             ...code.slice(0, activeLine),
-            code[activeLine].split('').slice(0, activeLineSymbol).join(''),
-            line,
+            code[activeLine].slice(0, activeLineSymbol),
+            line.split(''),
             ...code.slice(activeLine + 1),
           ];
           console.log(newArray);
@@ -117,9 +117,9 @@ export const EditorContainer = () => {
             if (activeLineSymbol !== 0) {
               const newArray = code.map((item, index) => {
                 if (index === activeLine) {
-                  const str = item.split('');
+                  const str = item;
                   str.splice(activeLineSymbol - 1, 1);
-                  return str.join('');
+                  return str;
                 } else {
                   return item;
                 }
@@ -134,7 +134,7 @@ export const EditorContainer = () => {
               const line = code[activeLine];
               const newArray = code.map((item, index) => {
                 if (index + 1 === activeLine) {
-                  item += line;
+                  item.push(...line);
                   return item;
                 }
                 if (index === activeLine) {
@@ -143,7 +143,7 @@ export const EditorContainer = () => {
                 return item;
               });
               const nArray = newArray.filter((item) => item !== undefined);
-              setCode(nArray as Array<string>);
+              setCode(nArray as Array<Array<string>>);
               toUpOnLastItem();
             }
           } else {
@@ -182,7 +182,9 @@ export const EditorContainer = () => {
               >
                 {code.map((item, index) => (
                   <div className={'min-h-[20px] whitespace-pre cursor-text truncate'} key={index}>
-                    {item}
+                    {item.map((element, index) => (
+                      <span key={index}>{element}</span>
+                    ))}
                   </div>
                 ))}
                 <div
