@@ -31,28 +31,32 @@ export const EditorContainer = () => {
 
   const editorContainerClickEvent = async (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      setActiveLine(code.length - 1);
-      setActiveLineSymbol(code[code.length - 1].length);
+      console.log(code)
+      await setActiveLine(code.length - 1);
+      if (code[activeLine].length === 1 && code[activeLine][0] === '') {
+        await setActiveLineSymbol(code[code.length - 1].length - 1);
+      } else {
+        await setActiveLineSymbol(code[code.length - 1].length);
+      }
     }
   };
 
   const lineClickEvent = async (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    console.log(e.target === e.currentTarget);
     const line = e.currentTarget.getAttribute('data-line');
-    if (line) {
-      setActiveLine(Number(line));
-    }
     if (e.target === e.currentTarget) {
-      console.log(line);
-      await setActiveLineSymbol(code[Number(line)].length + 1);
+      console.log('test')
+      await setActiveLineSymbol(code[Number(line)].length);
+    }
+    if (line) {
+      await setActiveLine(Number(line));
     }
   };
 
-  const letterClickEvent = (e: React.MouseEvent) => {
+  const letterClickEvent = async (e: React.MouseEvent) => {
     const letter = e.currentTarget.getAttribute('data-letter');
     if (letter) {
-      setActiveLineSymbol(Number(letter) + 1);
+      await setActiveLineSymbol(Number(letter) + 1);
     }
   };
 
@@ -69,26 +73,26 @@ export const EditorContainer = () => {
     left = activeLineSymbol * 9;
   }, [activeLineSymbol]);
 
-  const cursorToTop = () => {
-    setActiveLine(activeLine - 1 >= 0 ? activeLine - 1 : activeLine);
+  const cursorToTop = async () => {
+    await setActiveLine(activeLine - 1 >= 0 ? activeLine - 1 : activeLine);
   };
 
-  const cursorToDown = () => {
-    setActiveLine(activeLine + 2 > code.length ? activeLine : activeLine + 1);
+  const cursorToDown = async () => {
+    await setActiveLine(activeLine + 2 > code.length ? activeLine : activeLine + 1);
   };
 
-  const cursorToRight = () => {
-    setActiveLineSymbol(
+  const cursorToRight = async () => {
+    await setActiveLineSymbol(
       activeLineSymbol + 1 > code[activeLine].length ? activeLineSymbol : activeLineSymbol + 1
     );
   };
 
-  const cursorToLeft = () => {
-    setActiveLineSymbol(activeLineSymbol - 1 >= 0 ? activeLineSymbol - 1 : activeLineSymbol);
+  const cursorToLeft = async () => {
+    await setActiveLineSymbol(activeLineSymbol - 1 >= 0 ? activeLineSymbol - 1 : activeLineSymbol);
   };
 
-  const toUpOnLastItem = () => {
-    setActiveLineSymbol(code[activeLine].length);
+  const toUpOnLastItem = async () => {
+    await setActiveLineSymbol(code[activeLine].length);
   };
 
   const inputEvent = async (e: React.KeyboardEvent) => {
@@ -103,43 +107,40 @@ export const EditorContainer = () => {
             return item;
           }
         });
-        setActiveLineSymbol(activeLineSymbol + 1);
-        setCode(newArray);
+        await setActiveLineSymbol(activeLineSymbol + 1);
+        await setCode(newArray);
       } else {
         if (e.key === 'Enter') {
           let line = '';
           if (activeLineSymbol < code[activeLine].length) {
             line = code[activeLine].slice(activeLineSymbol).join('');
           }
-          console.log(code.slice(activeLine, 0));
           const newArray = [
             ...code.slice(0, activeLine),
             code[activeLine].slice(0, activeLineSymbol),
             line.split(''),
             ...code.slice(activeLine + 1),
           ];
-          console.log(newArray);
-          setCode(newArray);
-          setActiveLineSymbol(0);
-          setActiveLine(activeLine + 1);
-          console.log(code);
+          await setCode(newArray);
+          await setActiveLineSymbol(0);
+          await setActiveLine(activeLine + 1);
         }
         if (e.key.includes('Arrow')) {
           if (e.key === 'ArrowUp') {
-            cursorToTop();
+            await cursorToTop();
           }
           if (e.key === 'ArrowDown') {
-            cursorToDown();
+            await cursorToDown();
           }
           if (e.key === 'ArrowLeft') {
-            cursorToLeft();
+            await cursorToLeft();
           }
           if (e.key === 'ArrowRight') {
-            cursorToRight();
+            await cursorToRight();
           }
         }
         if (e.key === 'Backspace') {
-          if (code[activeLine].length !== 0) {
+          if (code[activeLine]?.length !== 0) {
             if (activeLineSymbol !== 0) {
               const newArray = code.map((item, index) => {
                 if (index === activeLine) {
@@ -150,8 +151,8 @@ export const EditorContainer = () => {
                   return item;
                 }
               });
-              cursorToLeft();
-              setCode(newArray);
+              await cursorToLeft();
+              await setCode(newArray);
             } else {
               if (activeLine === 0) {
                 return;
@@ -169,15 +170,15 @@ export const EditorContainer = () => {
                 return item;
               });
               const nArray = newArray.filter((item) => item !== undefined);
-              setCode(nArray as Array<Array<string>>);
-              toUpOnLastItem();
+              await setCode(nArray as Array<Array<string>>);
+              await toUpOnLastItem();
             }
           } else {
             const newArray = code.filter((item, index) => index !== activeLine);
             const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
-            setCode(newArray);
-            setActiveLine(newActiveLine);
-            toUpOnLastItem();
+            await setCode(newArray);
+            await setActiveLine(newActiveLine);
+            await toUpOnLastItem();
           }
         }
       }
