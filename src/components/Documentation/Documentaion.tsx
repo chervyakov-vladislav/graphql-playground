@@ -19,7 +19,6 @@ const Documentaion = () => {
   };
 
   const [getData, { data }] = useGetDataMutaion();
-  1;
 
   const handleClick = () => {
     getData(QUERY);

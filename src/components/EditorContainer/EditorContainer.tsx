@@ -31,12 +31,11 @@ export const EditorContainer = () => {
 
   const editorContainerClickEvent = async (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      console.log(code)
-      await setActiveLine(code.length - 1);
+      setActiveLine(code.length - 1);
       if (code[activeLine].length === 1 && code[activeLine][0] === '') {
-        await setActiveLineSymbol(code[code.length - 1].length - 1);
+        setActiveLineSymbol(code[code.length - 1].length - 1);
       } else {
-        await setActiveLineSymbol(code[code.length - 1].length);
+        setActiveLineSymbol(code[code.length - 1].length);
       }
     }
   };
@@ -45,18 +44,17 @@ export const EditorContainer = () => {
     e.stopPropagation();
     const line = e.currentTarget.getAttribute('data-line');
     if (e.target === e.currentTarget) {
-      console.log('test')
-      await setActiveLineSymbol(code[Number(line)].length);
+      setActiveLineSymbol(code[Number(line)].length);
     }
     if (line) {
-      await setActiveLine(Number(line));
+      setActiveLine(Number(line));
     }
   };
 
   const letterClickEvent = async (e: React.MouseEvent) => {
     const letter = e.currentTarget.getAttribute('data-letter');
     if (letter) {
-      await setActiveLineSymbol(Number(letter) + 1);
+      setActiveLineSymbol(Number(letter) + 1);
     }
   };
 
@@ -74,25 +72,25 @@ export const EditorContainer = () => {
   }, [activeLineSymbol]);
 
   const cursorToTop = async () => {
-    await setActiveLine(activeLine - 1 >= 0 ? activeLine - 1 : activeLine);
+    setActiveLine(activeLine - 1 >= 0 ? activeLine - 1 : activeLine);
   };
 
   const cursorToDown = async () => {
-    await setActiveLine(activeLine + 2 > code.length ? activeLine : activeLine + 1);
+    setActiveLine(activeLine + 2 > code.length ? activeLine : activeLine + 1);
   };
 
   const cursorToRight = async () => {
-    await setActiveLineSymbol(
+    setActiveLineSymbol(
       activeLineSymbol + 1 > code[activeLine].length ? activeLineSymbol : activeLineSymbol + 1
     );
   };
 
   const cursorToLeft = async () => {
-    await setActiveLineSymbol(activeLineSymbol - 1 >= 0 ? activeLineSymbol - 1 : activeLineSymbol);
+    setActiveLineSymbol(activeLineSymbol - 1 >= 0 ? activeLineSymbol - 1 : activeLineSymbol);
   };
 
   const toUpOnLastItem = async () => {
-    await setActiveLineSymbol(code[activeLine].length);
+    setActiveLineSymbol(code[activeLine].length);
   };
 
   const inputEvent = async (e: React.KeyboardEvent) => {
@@ -107,8 +105,8 @@ export const EditorContainer = () => {
             return item;
           }
         });
-        await setActiveLineSymbol(activeLineSymbol + 1);
-        await setCode(newArray);
+        setActiveLineSymbol(activeLineSymbol + 1);
+        setCode(newArray);
       } else {
         if (e.key === 'Enter') {
           let line = '';
@@ -121,9 +119,9 @@ export const EditorContainer = () => {
             line.split(''),
             ...code.slice(activeLine + 1),
           ];
-          await setCode(newArray);
-          await setActiveLineSymbol(0);
-          await setActiveLine(activeLine + 1);
+          setCode(newArray);
+          setActiveLineSymbol(0);
+          setActiveLine(activeLine + 1);
         }
         if (e.key.includes('Arrow')) {
           if (e.key === 'ArrowUp') {
@@ -152,7 +150,7 @@ export const EditorContainer = () => {
                 }
               });
               await cursorToLeft();
-              await setCode(newArray);
+              setCode(newArray);
             } else {
               if (activeLine === 0) {
                 return;
@@ -170,14 +168,14 @@ export const EditorContainer = () => {
                 return item;
               });
               const nArray = newArray.filter((item) => item !== undefined);
-              await setCode(nArray as Array<Array<string>>);
+              setCode(nArray as Array<Array<string>>);
               await toUpOnLastItem();
             }
           } else {
             const newArray = code.filter((item, index) => index !== activeLine);
             const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
-            await setCode(newArray);
-            await setActiveLine(newActiveLine);
+            setCode(newArray);
+            setActiveLine(newActiveLine);
             await toUpOnLastItem();
           }
         }
