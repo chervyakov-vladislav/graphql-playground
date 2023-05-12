@@ -4,14 +4,27 @@ import { Grid } from '@mui/material';
 import { useAppSelector } from '@/hooks/redux';
 import { EditorHeader } from '@/components/Editor/EditorHeader/EditorHeader';
 
-export const EditorContainer = () => {
+export function EditorContainer() {
   const { tabs, activeTabId } = useAppSelector((state) => state.editorTab);
   const [isFocus, setIsFocus] = useState(false);
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
   const [activeLine, setActiveLine] = useState(0);
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
+  const [activeLineWord, setActiveLineWord] = useState(0);
   const [requestCode, setRequestCode] = useState('');
   const [responseCode, setResponseCode] = useState('');
+  let height = activeLine * 20;
+  let left = activeLineSymbol * 9.7;
+  useEffect(() => {
+    height = activeLine * 24;
+    const lineLength = getActiveLineLength();
+    if (lineLength < activeLineSymbol) {
+      setActiveLineSymbol(lineLength);
+    }
+  }, [activeLine]);
+  useEffect(() => {
+    left = activeLineSymbol * 9;
+  }, [activeLineSymbol]);
 
   useEffect(() => {
     const item = tabs.find((item) => item.id == activeTabId);
@@ -29,165 +42,139 @@ export const EditorContainer = () => {
     setIsFocus(false);
   };
 
-  const editorContainerClickEvent = async (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      setActiveLine(code.length - 1);
-      if (code[activeLine].length === 1 && code[activeLine][0] === '') {
-        setActiveLineSymbol(code[code.length - 1].length - 1);
-      } else {
-        setActiveLineSymbol(code[code.length - 1].length);
-      }
+  const test = () => {
+    console.log(window.getSelection());
+  };
+
+  const updateCode = (newCodeArray: Array<Array<string>>) => {
+    setCode(newCodeArray);
+  };
+
+  const getActiveLineLength = () => {
+    return code[activeLine].reduce((acc, item) => acc + item.length, 0);
+  };
+
+  const getCurrentWord = () => {
+    const currentLine = code[activeLine];
+    let sumLength = 0;
+    let word = 0;
+    do {
+      sumLength += currentLine[word].length;
+      word += 1;
+    } while (sumLength < activeLineSymbol);
+    return {
+      word,
+      position: currentLine[word - 1].length - (sumLength - activeLineSymbol),
+    };
+  };
+
+  const addNewLetter = (letter: string) => {
+    let newCodeArray;
+    const { word, position } = getCurrentWord();
+    if (letter === ' ') {
+      newCodeArray = code.map((item, index) => {
+        if (index === activeLine) {
+          console.log(item[word]);
+          const itemArray = [
+            ...item.slice(0, word - 1),
+            item[word - 1].slice(0, position),
+            ' ',
+            item[word - 1].slice(position),
+            ...item.slice(word),
+          ];
+          console.log(itemArray);
+          return itemArray;
+        }
+        return item;
+      });
+      setActiveLineWord((prevState) => prevState + 1);
+    } else {
+      newCodeArray = code.map((item, index) => {
+        if (index === activeLine) {
+          let addToCount = 0;
+          if (item[word - 1] === ' ') {
+            item.splice(word, 0, '');
+            addToCount += 1;
+          }
+          const newLineArray = item[word + addToCount - 1].split('');
+          newLineArray.splice(position, 0, letter);
+          const newLine = newLineArray.join('');
+          const newItem = [
+            ...item.slice(0, word - 1 + addToCount),
+            newLine,
+            ...item.slice(word + addToCount),
+          ];
+          setActiveLineWord(word - 1 + addToCount);
+          return newItem;
+        }
+        return item;
+      });
+    }
+    setActiveLineSymbol((prevState) => prevState + 1);
+    updateCode(newCodeArray);
+  };
+
+  const addNewLine = () => {
+    const newArray = [...code.slice(0, activeLine + 1), [''], ...code.slice(activeLine + 1)];
+    setActiveLine((prevState) => prevState + 1);
+    setActiveLineWord(0);
+    setActiveLineSymbol(0);
+    updateCode(newArray);
+  };
+
+  const arrowNavigation = (key: string) => {
+    switch (key) {
+      case 'ArrowUp':
+        setActiveLine(activeLine - 1 >= 0 ? activeLine - 1 : activeLine);
+        break;
+      case 'ArrowDown':
+        setActiveLine(activeLine + 2 > code.length ? activeLine : activeLine + 1);
+        break;
+      case 'ArrowLeft':
+        setActiveLineSymbol(activeLineSymbol - 1 >= 0 ? activeLineSymbol - 1 : activeLineSymbol);
+        break;
+      case 'ArrowRight':
+        setActiveLineSymbol(
+          activeLineSymbol + 1 > getActiveLineLength() ? activeLineSymbol : activeLineSymbol + 1
+        );
+        break;
     }
   };
 
-  const lineClickEvent = async (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    const line = e.currentTarget.getAttribute('data-line');
-    if (e.target === e.currentTarget) {
-      setActiveLineSymbol(code[Number(line)].length);
+  const deleteSymbol = () => {
+    const lineLength = getActiveLineLength();
+    if (lineLength === 0) {
+      const newArray = code.filter((item, index) => index !== activeLine);
+      const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
+      setCode(newArray);
+      setActiveLine(newActiveLine);
+      setActiveLineSymbol(getActiveLineLength());
     }
-    if (line) {
-      setActiveLine(Number(line));
-    }
-  };
-
-  const letterClickEvent = async (e: React.MouseEvent) => {
-    const letter = e.currentTarget.getAttribute('data-letter');
-    if (letter) {
-      setActiveLineSymbol(Number(letter) + 1);
-    }
-  };
-
-  let height = activeLine * 20;
-  let left = activeLineSymbol * 9.7;
-  useEffect(() => {
-    height = activeLine * 24;
-    console.log(code[activeLine]);
-    if (code[activeLine].length < activeLineSymbol) {
-      setActiveLineSymbol(code[activeLine].length);
-    }
-  }, [activeLine]);
-  useEffect(() => {
-    left = activeLineSymbol * 9;
-  }, [activeLineSymbol]);
-
-  const cursorToTop = async () => {
-    setActiveLine(activeLine - 1 >= 0 ? activeLine - 1 : activeLine);
-  };
-
-  const cursorToDown = async () => {
-    setActiveLine(activeLine + 2 > code.length ? activeLine : activeLine + 1);
-  };
-
-  const cursorToRight = async () => {
-    setActiveLineSymbol(
-      activeLineSymbol + 1 > code[activeLine].length ? activeLineSymbol : activeLineSymbol + 1
-    );
-  };
-
-  const cursorToLeft = async () => {
-    setActiveLineSymbol(activeLineSymbol - 1 >= 0 ? activeLineSymbol - 1 : activeLineSymbol);
-  };
-
-  const toUpOnLastItem = async () => {
-    setActiveLineSymbol(code[activeLine].length);
   };
 
   const inputEvent = async (e: React.KeyboardEvent) => {
     if (isFocus) {
       if (e.key.length === 1) {
-        const newArray = code.map((item, index) => {
-          if (index === activeLine) {
-            const itemArray = item;
-            itemArray.splice(activeLineSymbol, 0, e.key);
-            return itemArray;
-          } else {
-            return item;
-          }
-        });
-        setActiveLineSymbol(activeLineSymbol + 1);
-        setCode(newArray);
+        addNewLetter(e.key);
       } else {
         if (e.key === 'Enter') {
-          let line = '';
-          if (activeLineSymbol < code[activeLine].length) {
-            line = code[activeLine].slice(activeLineSymbol).join('');
-          }
-          const newArray = [
-            ...code.slice(0, activeLine),
-            code[activeLine].slice(0, activeLineSymbol),
-            line.split(''),
-            ...code.slice(activeLine + 1),
-          ];
-          setCode(newArray);
-          setActiveLineSymbol(0);
-          setActiveLine(activeLine + 1);
+          addNewLine();
         }
         if (e.key.includes('Arrow')) {
-          if (e.key === 'ArrowUp') {
-            await cursorToTop();
-          }
-          if (e.key === 'ArrowDown') {
-            await cursorToDown();
-          }
-          if (e.key === 'ArrowLeft') {
-            await cursorToLeft();
-          }
-          if (e.key === 'ArrowRight') {
-            await cursorToRight();
-          }
+          arrowNavigation(e.key);
         }
         if (e.key === 'Backspace') {
-          if (code[activeLine]?.length !== 0) {
-            if (activeLineSymbol !== 0) {
-              const newArray = code.map((item, index) => {
-                if (index === activeLine) {
-                  const str = item;
-                  str.splice(activeLineSymbol - 1, 1);
-                  return str;
-                } else {
-                  return item;
-                }
-              });
-              await cursorToLeft();
-              setCode(newArray);
-            } else {
-              if (activeLine === 0) {
-                return;
-              }
-
-              const line = code[activeLine];
-              const newArray = code.map((item, index) => {
-                if (index + 1 === activeLine) {
-                  item.push(...line);
-                  return item;
-                }
-                if (index === activeLine) {
-                  return undefined;
-                }
-                return item;
-              });
-              const nArray = newArray.filter((item) => item !== undefined);
-              setCode(nArray as Array<Array<string>>);
-              await toUpOnLastItem();
-            }
-          } else {
-            const newArray = code.filter((item, index) => index !== activeLine);
-            const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
-            setCode(newArray);
-            setActiveLine(newActiveLine);
-            await toUpOnLastItem();
-          }
+          deleteSymbol();
         }
       }
     }
   };
 
   return (
-    <div className={'pt-12'}>
+    <div className="pt-12">
       <TabsContainer />
       <Grid
-        className={'pl-4'}
+        className="pl-4"
         container
         direction="row"
         justifyContent="center"
@@ -195,8 +182,8 @@ export const EditorContainer = () => {
         spacing={1}
       >
         <Grid item sm={6} xs={12}>
-          <div className={'flex mt-[8px] min-h-[78vh] bg-white rounded-lg'}>
-            <div className={'p-8 grow'}>
+          <div className="flex mt-[8px] min-h-[78vh] bg-white rounded-lg">
+            <div className="p-8 grow">
               <EditorHeader />
               <div
                 tabIndex={0}
@@ -204,17 +191,16 @@ export const EditorContainer = () => {
                 onFocus={focusEvent}
                 onBlur={blurEvent}
                 onKeyDown={inputEvent}
-                onClick={editorContainerClickEvent}
               >
                 {code.map((item, index) => (
                   <div
-                    className={'min-h-[20px] whitespace-pre cursor-text truncate'}
+                    className="min-h-[20px] whitespace-pre cursor-text truncate"
                     key={index}
                     data-line={index}
-                    onClick={lineClickEvent}
+                    onClick={test}
                   >
                     {item.map((element, indexLetter) => (
-                      <span key={indexLetter} data-letter={indexLetter} onClick={letterClickEvent}>
+                      <span key={indexLetter} data-letter={indexLetter}>
                         {element}
                       </span>
                     ))}
@@ -225,7 +211,7 @@ export const EditorContainer = () => {
                     isFocus ? 'visible' : 'hidden'
                   }`}
                   style={{ top: `${height}px`, left: `${left}px` }}
-                ></div>
+                />
               </div>
             </div>
           </div>
@@ -236,4 +222,4 @@ export const EditorContainer = () => {
       </Grid>
     </div>
   );
-};
+}
