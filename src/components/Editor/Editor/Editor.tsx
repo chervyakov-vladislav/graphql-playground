@@ -87,7 +87,6 @@ export function Editor() {
         if (index === activeLine) {
           let addToCount = 0;
           if (item[word - 1] === ' ') {
-            item.splice(word, 0, '');
             addToCount += 1;
           }
           const newLineArray = item[word + addToCount - 1].split('');
