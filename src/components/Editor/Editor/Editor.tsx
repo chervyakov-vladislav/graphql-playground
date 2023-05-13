@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/hooks/redux';
+import { preview } from 'vite';
 
 export function Editor() {
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
@@ -136,12 +137,40 @@ export function Editor() {
 
   const deleteSymbol = () => {
     const lineLength = getActiveLineLength();
+    const { word, position } = getCurrentWord();
     if (lineLength === 0) {
+      if (activeLine === 0) {
+        return;
+      }
       const newArray = code.filter((item, index) => index !== activeLine);
       const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
       setCode(newArray);
       setActiveLine(newActiveLine);
       setActiveLineSymbol(getActiveLineLength());
+    } else {
+      if (activeLineSymbol !== 0) {
+        const newArray = code.map((item, index) => {
+          if (index === activeLine) {
+            const newString = [
+              ...item[word - 1].slice(0, position - 1),
+              ...item[word - 1].slice(position),
+            ].join('');
+            let newLine;
+            if (newString) {
+              newLine = [...item.slice(0, word - 1), newString, ...item.slice(word)];
+            } else if (activeLine === 0 && activeLineSymbol === 1) {
+              newLine = [''];
+            } else {
+              newLine = [...item.slice(0, word - 1), ...item.slice(word)];
+            }
+            setActiveLineSymbol((prevState) => prevState - 1);
+            console.log(newLine);
+            return newLine;
+          }
+          return item;
+        });
+        updateCode(newArray);
+      }
     }
   };
 
