@@ -1,25 +1,93 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
+import { RootState } from '@/store/store';
+import { HYDRATE } from 'next-redux-wrapper';
+import { ActionHydrate, Data, Fields, Args, NavObj } from '@/types/schema-types';
 
 interface InitialState {
-  nav: string[];
+  nav: NavObj[];
+  schema: Data | null;
+  isRoot: boolean;
+  fields: Fields[];
+  args: Args[];
 }
+
 const initialState: InitialState = {
-  nav: ['Root', 'Query', 'Example'],
+  nav: [
+    {
+      name: 'root',
+      prevSchema: null,
+      prevFields: [],
+      prevArgs: [],
+    },
+  ],
+  isRoot: true,
+  schema: null,
+  fields: [],
+  args: [],
 };
 
 export const documentSlice = createSlice({
   name: 'document',
   initialState,
   reducers: {
-    addItem: (state, action: PayloadAction<string>) => {
+    addNavItem: (state, action: PayloadAction<NavObj>) => {
       state.nav.push(action.payload);
     },
+    sliceNavItems: (state, action: PayloadAction<number>) => {
+      state.nav = state.nav.slice(0, action.payload + 1);
+    },
+    deleteNavItem: (state) => {
+      state.nav.pop();
+    },
+    addSchema: (state, action: PayloadAction<Data>) => {
+      state.schema = action.payload;
+    },
+    setRoot: (state, action: PayloadAction<boolean>) => {
+      state.isRoot = action.payload;
+    },
+    resetRoot: (state) => {
+      state.nav = [
+        {
+          name: 'root',
+          prevSchema: null,
+          prevFields: [],
+          prevArgs: [],
+        },
+      ];
+    },
+    setFields: (state, action: PayloadAction<Fields[]>) => {
+      state.fields = action.payload;
+    },
+    setArgs: (state, action: PayloadAction<Args[]>) => {
+      state.args = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(HYDRATE, (state, action) => {
+      if ((action as ActionHydrate).payload.document.nav) {
+        state.nav = (action as ActionHydrate).payload.document.nav;
+      }
+
+      if ((action as ActionHydrate).payload.document.schema) {
+        state.schema = (action as ActionHydrate).payload.document.schema;
+      }
+
+      return state;
+    });
   },
 });
 
 export const selectDocument = (state: RootState) => state.document;
 
-export const { addItem } = documentSlice.actions;
+export const {
+  addNavItem,
+  addSchema,
+  setRoot,
+  setFields,
+  setArgs,
+  resetRoot,
+  deleteNavItem,
+  sliceNavItems,
+} = documentSlice.actions;
 
 export default documentSlice.reducer;

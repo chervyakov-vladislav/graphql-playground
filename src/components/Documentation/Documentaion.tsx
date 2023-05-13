@@ -1,29 +1,16 @@
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
+
 import SchemaNaviagation from './SchemaNavigation/SchemaNaviagation';
 import BackButton from './BackButton/BackButton';
 import Arguments from './Arguments/Arguments';
 import Fields from './Fields/Fields';
-import { useGetDataMutaion } from '../../store/api';
+import Root from './Root/Root';
+
+import { useAppSelector } from '@/store/hooks';
+import { selectDocument } from '@/store/reducers/document/slice';
 
 const Documentaion = () => {
-  const QUERY = {
-    query: `{
-    __schema {
-      queryType {
-        fields {
-          name
-        }
-      }
-    }
-  }`,
-  };
-
-  const [getData, { data }] = useGetDataMutaion();
-  1;
-
-  const handleClick = () => {
-    getData(QUERY);
-  };
+  const { isRoot } = useAppSelector(selectDocument);
 
   return (
     <>
@@ -39,13 +26,15 @@ const Documentaion = () => {
         Documentation
       </Typography>
       <SchemaNaviagation />
-      <BackButton />
-      <Arguments />
-      <Fields />
-      <Button onClick={handleClick}>Загрузить</Button>
-      <pre className="break-all whitespace-pre-wrap">
-        {data ? JSON.stringify(data, null, '  ') : 'data template'}
-      </pre>
+      {isRoot ? (
+        <Root />
+      ) : (
+        <>
+          <BackButton />
+          <Arguments />
+          <Fields />
+        </>
+      )}
     </>
   );
 };
