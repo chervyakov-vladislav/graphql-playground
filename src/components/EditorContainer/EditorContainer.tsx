@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
 import { TabsContainer } from '@/components/Editor/TabsContainer/TabsContainer';
 import { Grid } from '@mui/material';
 import { EditorHeader } from '@/components/Editor/EditorHeader/EditorHeader';
 import { Editor } from '@/components/Editor/Editor/Editor';
+import { Response } from '@/components/Response/Response';
 
 export function EditorContainer() {
-  const [responseCode, setResponseCode] = useState('');
   return (
     <div className="pt-12">
       <TabsContainer />
@@ -26,7 +25,7 @@ export function EditorContainer() {
           </div>
         </Grid>
         <Grid item sm={6} xs={12}>
-          {responseCode}
+          <Response />
         </Grid>
       </Grid>
     </div>

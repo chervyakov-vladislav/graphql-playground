@@ -3,7 +3,7 @@ import SchemaNaviagation from './SchemaNavigation/SchemaNaviagation';
 import BackButton from './BackButton/BackButton';
 import Arguments from './Arguments/Arguments';
 import Fields from './Fields/Fields';
-import { useGetDataMutaion } from '../../store/api';
+import { useGetDataMutation } from '../../store/api';
 
 const Documentaion = () => {
   const QUERY = {
@@ -18,7 +18,7 @@ const Documentaion = () => {
   }`,
   };
 
-  const [getData, { data }] = useGetDataMutaion();
+  const [getData, { data }] = useGetDataMutation();
 
   const handleClick = () => {
     getData(QUERY);

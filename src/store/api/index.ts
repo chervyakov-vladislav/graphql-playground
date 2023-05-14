@@ -20,7 +20,7 @@ export const graphQl = createApi({
     }
   },
   endpoints: (build) => ({
-    getData: build.mutation<object, PayloadParams>({
+    getData: build.mutation({
       query: (body: PayloadParams) => ({
         url: '/',
         method: 'POST',
@@ -34,6 +34,6 @@ export const graphQl = createApi({
   }),
 });
 
-export const useGetDataMutaion = graphQl.useGetDataMutation;
+export const { useGetDataMutation } = graphQl;
 
 export const { getData } = graphQl.endpoints;
