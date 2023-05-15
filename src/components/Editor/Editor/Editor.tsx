@@ -37,8 +37,43 @@ export function Editor() {
     setIsFocus(false);
   };
 
-  const test = () => {
+  const clickNavigation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const line = e.currentTarget.getAttribute('data-line');
+    // @ts-ignore
+    const word = e.target.getAttribute('data-letter');
+    console.log(word);
+    const position = window.getSelection()?.focusOffset;
+    if (line) {
+      setActiveLine(Number(line));
+    }
+    if (word) {
+      let lineLength = 0;
+      for (let i = 0; i < word; i++) {
+        if (Number(line) >= 0) {
+          lineLength += code[Number(line)][i].length;
+        }
+      }
+      if (position) {
+        if (code[Number(line)][word] === ' ') {
+          setActiveLineSymbol(lineLength + 1);
+        } else {
+          setActiveLineSymbol(lineLength + position);
+        }
+      }
+    } else {
+      if (line) {
+        setActiveLineSymbol(getActiveLineLength(Number(line)));
+      }
+    }
     console.log(window.getSelection());
+  };
+
+  const editorClickEvent = () => {
+    const line = code.length;
+    const lastSymbol = getActiveLineLength(line - 1);
+    setActiveLine(line - 1);
+    setActiveLineSymbol(lastSymbol);
   };
 
   const updateCode = (newCodeArray: Array<Array<string>>) => {
@@ -279,12 +314,12 @@ export function Editor() {
     }
   };
   return (
-    <div className="flex">
+    <div className="flex h-full">
       <div className="text-black pr-3">
         {code.map((item, index) => (
           <div
             key={index + 10}
-            className={`leading-5 font-SourceCodePro text-center ${
+            className={`leading-5 font-SourceCodePro text-center min-w-[20px] ${
               index === activeLine ? 'text-color-code-active' : 'text-color-code'
             }`}
           >
@@ -298,13 +333,14 @@ export function Editor() {
         onFocus={focusEvent}
         onBlur={blurEvent}
         onKeyDown={inputEvent}
+        onClick={editorClickEvent}
       >
         {code.map((item, index) => (
           <div
             className="min-h-[20px] whitespace-pre cursor-text truncate"
             key={index}
             data-line={index}
-            onClick={test}
+            onClick={clickNavigation}
           >
             {item.map((element, indexLetter) => (
               <span key={indexLetter} data-letter={indexLetter}>
