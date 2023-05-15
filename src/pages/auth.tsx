@@ -1,6 +1,6 @@
-import React from 'react';
 import GraphLogoBlock from '@/components/GraphLogoBlock/GraphLogoBlock';
-import { MainAuthBlock } from '@/components/Main/MainAuthBlock/MainAuthBlock';
+import React from 'react';
+import FormAuth from '@/components/Form/FormAuth';
 
 const Auth = () => (
   <div className={'bg-gradient-to-br from-[#7c22ce] via-60% via-[#3c1a98] to-[#00197c] w-full'}>
@@ -10,7 +10,7 @@ const Auth = () => (
       }
     >
       <GraphLogoBlock>
-        <MainAuthBlock />
+        <FormAuth />
       </GraphLogoBlock>
     </div>
   </div>

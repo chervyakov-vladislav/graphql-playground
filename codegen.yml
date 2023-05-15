@@ -4,3 +4,6 @@ generates:
   ./src/types/types.generated.ts:
     plugins:
       - typescript
+  ./src/types/graphql.schema.json:
+    plugins:
+      - "introspection"

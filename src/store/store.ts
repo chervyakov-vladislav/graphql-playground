@@ -5,6 +5,7 @@ import { graphQl } from './api';
 import documentReducer from './reducers/document/slice';
 import editorReducer from './reducers/editor/slice';
 import editorTabReducer from './reducers/editorTabs/slice';
+import authReducer from './reducers/auth/authSlice';
 
 type TypeToolkitRaw = typeof toolkitRaw & { default?: unknown };
 const { combineReducers, configureStore } = ((toolkitRaw as TypeToolkitRaw).default ??
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   document: documentReducer,
   editor: editorReducer,
   editorTab: editorTabReducer,
+  auth: authReducer,
   [graphQl.reducerPath]: graphQl.reducer,
 });
 
@@ -28,4 +30,4 @@ export type RootState = ReturnType<typeof rootReducer>;
 export type AppStore = ReturnType<typeof makeStore>;
 export type AppDispatch = AppStore['dispatch'];
 
-export const wrapper = createWrapper<AppStore>(makeStore, { debug: true });
+export const wrapper = createWrapper<AppStore>(makeStore);
