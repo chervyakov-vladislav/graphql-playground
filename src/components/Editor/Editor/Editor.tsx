@@ -68,17 +68,40 @@ export function Editor() {
   const addNewLetter = (letter: string) => {
     let newCodeArray;
     const { word, position } = getCurrentWord();
-    if (letter === ' ') {
+    if (!letter.match(/\w|[А-я]/gm)) {
       newCodeArray = code.map((item, index) => {
         if (index === activeLine) {
-          const itemArray = [
-            ...item.slice(0, word - 1),
-            item[word - 1].slice(0, position),
-            ' ',
-            item[word - 1].slice(position),
-            ...item.slice(word),
-          ];
-          return itemArray;
+          const rightSide = item[word - 1].slice(position);
+          let itemArray;
+          if (item.slice(word).length) {
+            if (rightSide) {
+              itemArray = [
+                ...item.slice(0, word - 1),
+                item[word - 1].slice(0, position),
+                letter,
+                item[word - 1].slice(position),
+                ...item.slice(word),
+              ];
+            } else {
+              itemArray = [
+                ...item.slice(0, word - 1),
+                item[word - 1].slice(0, position),
+                letter,
+                ...item.slice(word),
+              ];
+            }
+          } else {
+            itemArray = [
+              ...item.slice(0, word - 1),
+              item[word - 1].slice(0, position),
+              letter,
+              item[word - 1].slice(position),
+              ...item.slice(word),
+            ];
+          }
+          const filterArray = itemArray.filter((str) => str !== '');
+          console.log(filterArray);
+          return filterArray.length ? filterArray : [''];
         }
         return item;
       });
@@ -87,7 +110,9 @@ export function Editor() {
       newCodeArray = code.map((item, index) => {
         if (index === activeLine) {
           let addToCount = 0;
-          if (item[word - 1] === ' ') {
+          console.log(item[word - 1].match(/\w|[А-я]/gm));
+          if (!item[word - 1].match(/\w|[А-я]/gm)) {
+            item.splice(word, 0, '');
             addToCount += 1;
           }
           const newLineArray = item[word + addToCount - 1].split('');
