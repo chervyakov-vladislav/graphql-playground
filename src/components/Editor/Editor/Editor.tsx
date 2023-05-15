@@ -279,33 +279,47 @@ export function Editor() {
     }
   };
   return (
-    <div
-      tabIndex={0}
-      className="text-black min-h-[500px] h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
-      onFocus={focusEvent}
-      onBlur={blurEvent}
-      onKeyDown={inputEvent}
-    >
-      {code.map((item, index) => (
-        <div
-          className="min-h-[20px] whitespace-pre cursor-text truncate"
-          key={index}
-          data-line={index}
-          onClick={test}
-        >
-          {item.map((element, indexLetter) => (
-            <span key={indexLetter} data-letter={indexLetter}>
-              {element}
-            </span>
-          ))}
-        </div>
-      ))}
+    <div className="flex">
+      <div className="text-black pr-3">
+        {code.map((item, index) => (
+          <div
+            key={index + 10}
+            className={`leading-5 font-SourceCodePro text-center ${
+              index === activeLine ? 'text-color-code-active' : 'text-color-code'
+            }`}
+          >
+            {index + 1}
+          </div>
+        ))}
+      </div>
       <div
-        className={`absolute h-[24px] w-[2px] bg-black animate-blink-cursor ${
-          isFocus ? 'visible' : 'hidden'
-        }`}
-        style={{ top: `${height}px`, left: `${left}px` }}
-      />
+        tabIndex={0}
+        className="text-black min-h-[500px] h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
+        onFocus={focusEvent}
+        onBlur={blurEvent}
+        onKeyDown={inputEvent}
+      >
+        {code.map((item, index) => (
+          <div
+            className="min-h-[20px] whitespace-pre cursor-text truncate"
+            key={index}
+            data-line={index}
+            onClick={test}
+          >
+            {item.map((element, indexLetter) => (
+              <span key={indexLetter} data-letter={indexLetter}>
+                {element}
+              </span>
+            ))}
+          </div>
+        ))}
+        <div
+          className={`absolute h-[24px] w-[2px] bg-black animate-blink-cursor ${
+            isFocus ? 'visible' : 'hidden'
+          }`}
+          style={{ top: `${height}px`, left: `${left}px` }}
+        />
+      </div>
     </div>
   );
 }

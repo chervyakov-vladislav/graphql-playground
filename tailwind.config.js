@@ -43,6 +43,8 @@ module.exports = {
         'color-text-red': '#d2054e',
         'color-text-orange': '#ca9800',
         'color-text-green': '#00c773',
+        'color-code-active': '#2a3b81',
+        'color-code': '#969da8',
       },
       fontFamily: {
         SourceSansPro: ['Source Sans Pro', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
