@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/hooks/redux';
-import { preview } from 'vite';
 
 export function Editor() {
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
@@ -47,8 +46,9 @@ export function Editor() {
     setCode(newCodeArray);
   };
 
-  const getActiveLineLength = () => {
-    return code[activeLine].reduce((acc, item) => acc + item.length, 0);
+  const getActiveLineLength = (line?: number) => {
+    const lineToCalc = line ?? activeLine;
+    return code[lineToCalc].reduce((acc, item) => acc + item.length, 0);
   };
 
   const getCurrentWord = () => {
@@ -109,7 +109,31 @@ export function Editor() {
   };
 
   const addNewLine = () => {
-    const newArray = [...code.slice(0, activeLine + 1), [''], ...code.slice(activeLine + 1)];
+    let newArray;
+    const lineLength = getActiveLineLength();
+    if (activeLineSymbol === lineLength) {
+      newArray = [...code.slice(0, activeLine + 1), [''], ...code.slice(activeLine + 1)];
+    } else {
+      const { word, position } = getCurrentWord();
+      let restLine = [''];
+      newArray = code.map((item, index) => {
+        if (index === activeLine) {
+          const newLine = [
+            ...item.slice(0, word - 1),
+            item[word - 1].split('').slice(0, position).join(''),
+          ];
+          const firstWord = item[word - 1].split('').slice(position).join('');
+          if (firstWord) {
+            restLine = [item[word - 1].split('').slice(position).join(''), ...item.slice(word)];
+          } else {
+            restLine = [...item.slice(word)];
+          }
+          return newLine;
+        }
+        return item;
+      });
+      newArray.splice(activeLine + 1, 0, restLine);
+    }
     setActiveLine((prevState) => prevState + 1);
     setActiveLineWord(0);
     setActiveLineSymbol(0);
@@ -146,7 +170,7 @@ export function Editor() {
       const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
       setCode(newArray);
       setActiveLine(newActiveLine);
-      setActiveLineSymbol(getActiveLineLength());
+      setActiveLineSymbol(getActiveLineLength(activeLine - 1));
     } else {
       if (activeLineSymbol !== 0) {
         const newArray = code.map((item, index) => {
@@ -158,17 +182,42 @@ export function Editor() {
             let newLine;
             if (newString) {
               newLine = [...item.slice(0, word - 1), newString, ...item.slice(word)];
-            } else if (activeLine === 0 && activeLineSymbol === 1) {
+            } else if (activeLine === 0 && activeLineSymbol === 1 && getActiveLineLength() === 1) {
               newLine = [''];
             } else {
               newLine = [...item.slice(0, word - 1), ...item.slice(word)];
             }
             setActiveLineSymbol((prevState) => prevState - 1);
             console.log(newLine);
+            if (newLine.length === 0) {
+              newLine = [''];
+            }
             return newLine;
           }
           return item;
         });
+        updateCode(newArray);
+      }
+      if (activeLineSymbol === 0) {
+        if (activeLine === 0) {
+          return;
+        }
+        const lineToDelete = code[activeLine];
+        let newLine;
+        const wordOnEndOfPrevLine = code[activeLine - 1].at(-1);
+        if (wordOnEndOfPrevLine && wordOnEndOfPrevLine === ' ') {
+          newLine = [...code[activeLine - 1], ...lineToDelete];
+        } else {
+          newLine = [
+            ...code[activeLine - 1].slice(0, -1),
+            code[activeLine - 1][code[activeLine - 1].length - 1] + lineToDelete[0],
+            ...lineToDelete.slice(1),
+          ];
+        }
+        const newArray = [...code.slice(0, activeLine - 1), newLine, ...code.slice(activeLine + 1)];
+        console.log(getActiveLineLength(activeLine - 1));
+        setActiveLineSymbol(getActiveLineLength(activeLine - 1));
+        setActiveLine((prevState) => prevState - 1);
         updateCode(newArray);
       }
     }

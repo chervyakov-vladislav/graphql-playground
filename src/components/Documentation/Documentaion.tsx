@@ -43,7 +43,6 @@ const Documentaion = () => {
       >
         Documentation
       </Typography>
-      <SchemaNaviagation />
       {isRoot ? (
         <Root />
       ) : (
