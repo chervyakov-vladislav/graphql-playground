@@ -5,7 +5,6 @@ export function Editor() {
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
   const [activeLine, setActiveLine] = useState(0);
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
-  const [activeLineWord, setActiveLineWord] = useState(0);
   const { tabs, activeTabId } = useAppSelector((state) => state.editorTab);
   const [isFocus, setIsFocus] = useState(false);
   const [requestCode, setRequestCode] = useState('');
@@ -68,17 +67,18 @@ export function Editor() {
   const addNewLetter = (letter: string) => {
     let newCodeArray;
     const { word, position } = getCurrentWord();
-    if (!letter.match(/\w|[А-я]/gm)) {
+    if (!letter.match(/\w|[А-я]/gm) || letter === 'Tab') {
       newCodeArray = code.map((item, index) => {
         if (index === activeLine) {
           const rightSide = item[word - 1].slice(position);
           let itemArray;
+          const newLetter = letter === '{' ? ['{', '}'] : letter === 'Tab' ? [' ', ' '] : [letter];
           if (item.slice(word).length) {
             if (rightSide) {
               itemArray = [
                 ...item.slice(0, word - 1),
                 item[word - 1].slice(0, position),
-                letter,
+                ...newLetter,
                 item[word - 1].slice(position),
                 ...item.slice(word),
               ];
@@ -86,7 +86,7 @@ export function Editor() {
               itemArray = [
                 ...item.slice(0, word - 1),
                 item[word - 1].slice(0, position),
-                letter,
+                ...newLetter,
                 ...item.slice(word),
               ];
             }
@@ -94,23 +94,20 @@ export function Editor() {
             itemArray = [
               ...item.slice(0, word - 1),
               item[word - 1].slice(0, position),
-              letter,
+              ...newLetter,
               item[word - 1].slice(position),
               ...item.slice(word),
             ];
           }
           const filterArray = itemArray.filter((str) => str !== '');
-          console.log(filterArray);
           return filterArray.length ? filterArray : [''];
         }
         return item;
       });
-      setActiveLineWord((prevState) => prevState + 1);
     } else {
       newCodeArray = code.map((item, index) => {
         if (index === activeLine) {
           let addToCount = 0;
-          console.log(item[word - 1].match(/\w|[А-я]/gm));
           if (!item[word - 1].match(/\w|[А-я]/gm)) {
             item.splice(word, 0, '');
             addToCount += 1;
@@ -123,13 +120,16 @@ export function Editor() {
             newLine,
             ...item.slice(word + addToCount),
           ];
-          setActiveLineWord(word - 1 + addToCount);
           return newItem;
         }
         return item;
       });
     }
-    setActiveLineSymbol((prevState) => prevState + 1);
+    if (letter === 'Tab') {
+      setActiveLineSymbol((prevState) => prevState + 2);
+    } else {
+      setActiveLineSymbol((prevState) => prevState + 1);
+    }
     updateCode(newCodeArray);
   };
 
@@ -160,7 +160,6 @@ export function Editor() {
       newArray.splice(activeLine + 1, 0, restLine);
     }
     setActiveLine((prevState) => prevState + 1);
-    setActiveLineWord(0);
     setActiveLineSymbol(0);
     updateCode(newArray);
   };
@@ -255,6 +254,10 @@ export function Editor() {
       } else {
         if (e.key === 'Enter') {
           addNewLine();
+        }
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          addNewLetter('Tab');
         }
         if (e.key.includes('Arrow')) {
           arrowNavigation(e.key);
