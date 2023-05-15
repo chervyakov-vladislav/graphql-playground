@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { authActions } from '@/store/reducers/auth/authSlice';
 import { KindForm } from '@/types/enums';
 import Button from '@mui/material/Button';
@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 export const MainAuthBlock = () => {
+  const { id } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const handleClick = (
@@ -13,15 +14,19 @@ export const MainAuthBlock = () => {
   ) => {
     event.preventDefault();
     if (event.target instanceof HTMLButtonElement && event.target.name) {
-      switch (event.target?.name) {
-        case 'login':
-          dispatch(authActions.changeKindOfForm(KindForm.login));
-          break;
-        case 'signin':
-          dispatch(authActions.changeKindOfForm(KindForm.signin));
-          break;
+      if (id) {
+        router.push('/graphql');
+      } else {
+        switch (event.target?.name) {
+          case 'login':
+            dispatch(authActions.changeKindOfForm(KindForm.login));
+            break;
+          case 'signin':
+            dispatch(authActions.changeKindOfForm(KindForm.signin));
+            break;
+        }
+        router.push('/auth');
       }
-      router.push('/auth');
     }
   };
 
@@ -47,16 +52,18 @@ export const MainAuthBlock = () => {
       >
         Log in
       </Button>
-      <Button
-        variant="contained"
-        name="signin"
-        onClick={handleClick}
-        className={
-          'bg-transparent text-color-bright-black font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-transparent shadow-none hover:border-color-bright-black hover:bg-transparent'
-        }
-      >
-        Sign in
-      </Button>
+      {!id && (
+        <Button
+          variant="contained"
+          name="signin"
+          onClick={handleClick}
+          className={
+            'bg-transparent text-color-bright-black font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-transparent shadow-none hover:border-color-bright-black hover:bg-transparent'
+          }
+        >
+          Sign in
+        </Button>
+      )}
     </div>
   );
 };

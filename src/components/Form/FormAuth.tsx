@@ -5,42 +5,59 @@ import FormSignin from './FormSignin';
 import { FormAuthType } from '@/types/types';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { authActions } from '@/store/reducers/auth/authSlice';
-import { firebaseAuth } from 'firebase.config';
+import { auth } from 'firebase.config';
 import Router from 'next/router';
+import { Alert, AlertTitle, Backdrop, CircularProgress } from '@mui/material';
 
 const FormAuth = () => {
-  const { kindOfForm } = useAppSelector((state) => state.auth);
+  const { kindOfForm, isLoading, error } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const handleSubmit = (data: FormAuthType) => {
     if (kindOfForm === KindForm.login) {
-      signInWithEmailAndPassword(firebaseAuth, data.email, data.password)
+      signInWithEmailAndPassword(auth, data.email, data.password)
         .then(({ user }) => {
+          dispatch(authActions.setIsLoading(true));
           dispatch(authActions.setUser({ id: user.uid, token: user.refreshToken }));
+          dispatch(authActions.setIsLoading(false));
           Router.push('/graphql');
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.error(errorCode, errorMessage);
-
-          alert('no such user');
+          dispatch(authActions.setError(error.message));
+          setTimeout(() => dispatch(authActions.clearError()), 5000);
         });
     }
     if (kindOfForm === KindForm.signin) {
-      createUserWithEmailAndPassword(firebaseAuth, data.email, data.password)
+      createUserWithEmailAndPassword(auth, data.email, data.password)
         .then(({ user }) => {
+          dispatch(authActions.setIsLoading(true));
           dispatch(authActions.setUser({ id: user.uid, token: user.refreshToken }));
           Router.push('/graphql');
+          dispatch(authActions.setIsLoading(false));
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.error(errorCode, errorMessage);
+          dispatch(authActions.setError(error.message));
+          setTimeout(() => dispatch(authActions.clearError()), 5000);
         });
     }
   };
 
-  if (kindOfForm === KindForm.login) return <FormLogin onSubmit={handleSubmit} />;
-  return <FormSignin onSubmit={handleSubmit} />;
+  return (
+    <>
+      {kindOfForm === KindForm.login ? (
+        <FormLogin onSubmit={handleSubmit} />
+      ) : (
+        <FormSignin onSubmit={handleSubmit} />
+      )}
+      {error && (
+        <Alert severity="error" className="text-left">
+          <AlertTitle>Error</AlertTitle>
+          {error}
+        </Alert>
+      )}
+      <Backdrop open={isLoading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </>
+  );
 };
 export default FormAuth;

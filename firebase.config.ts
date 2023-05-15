@@ -1,4 +1,4 @@
-import { FirebaseOptions, getApp, initializeApp } from 'firebase/app';
+import { FirebaseOptions, getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig: FirebaseOptions = {
@@ -11,12 +11,12 @@ const firebaseConfig: FirebaseOptions = {
 };
 
 function createFirebaseApp(config: FirebaseOptions) {
-  try {
+  if (getApps().length) {
     return getApp();
-  } catch {
+  } else {
     return initializeApp(config);
   }
 }
 
 const firebaseApp = createFirebaseApp(firebaseConfig);
-export const firebaseAuth = getAuth(firebaseApp);
+export const auth = getAuth(firebaseApp);
