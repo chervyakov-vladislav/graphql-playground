@@ -183,6 +183,10 @@ export function Editor() {
     }
   };
 
+  const cursorToEnd = () => {
+    setActiveLineSymbol(getActiveLineLength());
+  };
+
   const deleteSymbol = () => {
     const lineLength = getActiveLineLength();
     const { word, position } = getCurrentWord();
@@ -258,6 +262,12 @@ export function Editor() {
         if (e.key === 'Tab') {
           e.preventDefault();
           addNewLetter('Tab');
+        }
+        if (e.key === 'End') {
+          cursorToEnd();
+        }
+        if (e.key === 'Home') {
+          setActiveLineSymbol(0);
         }
         if (e.key.includes('Arrow')) {
           arrowNavigation(e.key);
