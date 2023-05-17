@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/hooks/redux';
+import { ISelectionData } from '@/types/editorTypes';
 import { ConstructionOutlined } from '@mui/icons-material';
 
 export function Editor() {
@@ -8,6 +9,7 @@ export function Editor() {
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
   const { tabs, activeTabId } = useAppSelector((state) => state.editorTab);
   const [isFocus, setIsFocus] = useState(false);
+  const [selectionOptions, setSelectionOptions] = useState<ISelectionData | undefined>();
   const [requestCode, setRequestCode] = useState('');
 
   let height = activeLine * 20;
@@ -42,8 +44,7 @@ export function Editor() {
     e.stopPropagation();
     const line = e.currentTarget.getAttribute('data-line');
     // @ts-ignore
-    const word = e.target.getAttribute('data-letter');
-    console.log(word);
+    const word = e.target?.getAttribute('data-letter');
     const position = window.getSelection()?.focusOffset;
     if (line) {
       setActiveLine(Number(line));
@@ -67,7 +68,6 @@ export function Editor() {
         setActiveLineSymbol(getActiveLineLength(Number(line)));
       }
     }
-    console.log(window.getSelection());
   };
 
   const editorClickEvent = () => {
@@ -328,6 +328,90 @@ export function Editor() {
         currString.slice(activeLineSymbol),
       ].join('');
 
+  const setSelectionCode = (
+    lineStart: number,
+    wordStart: number,
+    wordStartOffset: number,
+    lineEnd: number,
+    wordEnd: number,
+    wordEndOffset: number
+  ) => {
+    const selectionOptions: ISelectionData = {
+      startSelection: {
+        lineStart,
+        wordStart,
+        wordStartOffset,
+      },
+      endSelection: {
+        lineEnd,
+        wordEnd,
+        wordEndOffset,
+      },
+    };
+    console.log(selectionOptions);
+  };
+
+  const mouseUpHandler = () => {
+    const selection = window.getSelection();
+    if (selection) {
+      const lineStart = Number(selection.anchorNode?.parentElement?.getAttribute('data-line'));
+      const wordStart = Number(selection.anchorNode?.parentElement?.getAttribute('data-letter'));
+      const wordStartOffset = Number(selection.anchorOffset);
+      const lineEnd = Number(selection.focusNode?.parentElement?.getAttribute('data-line'));
+      const wordEnd = Number(selection.focusNode?.parentElement?.getAttribute('data-letter'));
+      const wordEndOffset = Number(selection.focusOffset);
+      if (
+        lineStart >= 0 &&
+        wordStart >= 0 &&
+        wordStartOffset >= 0 &&
+        lineEnd >= 0 &&
+        wordEnd >= 0 &&
+        wordEndOffset >= 0
+      ) {
+        if (!selection.isCollapsed) {
+          let isReverse = false;
+          if (lineEnd < lineStart) {
+            isReverse = true;
+          }
+          if (lineStart === lineEnd) {
+            if (wordEnd < wordStart) {
+              isReverse = true;
+            }
+            if (wordStart === wordEnd) {
+              if (wordEndOffset < wordStartOffset) {
+                isReverse = true;
+              }
+            }
+          }
+          if (isReverse) {
+            setSelectionCode(
+              lineEnd,
+              wordEnd,
+              wordEndOffset,
+              lineStart,
+              wordStart,
+              wordStartOffset
+            );
+          } else {
+            setSelectionCode(
+              lineStart,
+              wordStart,
+              wordStartOffset,
+              lineEnd,
+              wordEnd,
+              wordEndOffset
+            );
+          }
+        } else {
+          console.log('Only click');
+        }
+      } else {
+        console.log('Selection not found');
+      }
+    }
+    editorClickEvent();
+  };
+
       const wordsNew = getWords(currLineArr);
 
       const newCodeArray = copyCode
@@ -376,7 +460,7 @@ export function Editor() {
         {code.map((item, index) => (
           <div
             key={index + 10}
-            className={`leading-5 font-SourceCodePro text-center min-w-[20px] ${
+            className={`leading-5 font-SourceCodePro text-center min-w-[20px] select-none ${
               index === activeLine ? 'text-color-code-active' : 'text-color-code'
             }`}
           >
@@ -390,8 +474,9 @@ export function Editor() {
         onFocus={focusEvent}
         onBlur={blurEvent}
         onKeyDown={inputEvent}
+        // onClick={editorClickEvent}
+        onMouseUpCapture={mouseUpHandler}
         onPaste={pasteHandler}
-        onClick={editorClickEvent}
       >
         {code.map((item, index) => (
           <div
@@ -401,7 +486,7 @@ export function Editor() {
             onClick={clickNavigation}
           >
             {item.map((element, indexLetter) => (
-              <span key={indexLetter} data-letter={indexLetter}>
+              <span key={indexLetter} data-letter={indexLetter} data-line={index}>
                 {element}
               </span>
             ))}

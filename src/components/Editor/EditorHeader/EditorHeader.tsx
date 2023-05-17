@@ -4,7 +4,7 @@ import React from 'react';
 
 export const EditorHeader = () => {
   return (
-    <div className="flex font-SourceSansPro justify-between">
+    <div className="flex font-SourceSansPro justify-between select-none">
       <h3 className="text-black m-0 p-0">Operation</h3>
       <Button
         sx={{
