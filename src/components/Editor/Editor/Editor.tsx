@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/hooks/redux';
 import { ISelectionData } from '@/types/editorTypes';
-import { ConstructionOutlined } from '@mui/icons-material';
 
 export function Editor() {
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
@@ -9,7 +8,7 @@ export function Editor() {
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
   const { tabs, activeTabId } = useAppSelector((state) => state.editorTab);
   const [isFocus, setIsFocus] = useState(false);
-  const [selectionOptions, setSelectionOptions] = useState<ISelectionData | undefined>();
+  const [selectionOptions, setSelectionOptions] = useState<ISelectionData | undefined>(undefined);
   const [requestCode, setRequestCode] = useState('');
 
   let height = activeLine * 20;
@@ -90,26 +89,35 @@ export function Editor() {
     return array[lineToCalc].reduce((acc, item) => acc + item.length, 0);
   };
 
-  const getCurrentWord = () => {
-    const currentLine = code[activeLine];
+  const getCurrentWord = (codeActiveLine?: Array<string>, lineCursor?: number) => {
+    const currentLine = codeActiveLine ?? code[activeLine];
+    const cursor = lineCursor ?? activeLineSymbol;
     let sumLength = 0;
     let word = 0;
     do {
       sumLength += currentLine[word].length;
       word += 1;
-    } while (sumLength < activeLineSymbol);
+    } while (sumLength < cursor);
     return {
       word,
-      position: currentLine[word - 1].length - (sumLength - activeLineSymbol),
+      position: currentLine[word - 1].length - (sumLength - cursor),
     };
   };
 
-  const addNewLetter = (letter: string) => {
+  const addNewLetter = (
+    letter: string,
+    array?: Array<Array<string>>,
+    newActiveLine?: number,
+    cursorPosition?: number
+  ) => {
+    const arrayWithCode = array ?? code;
+    const codeActiveLine = newActiveLine ?? activeLine;
+    const lineCursorPosition = cursorPosition ?? activeLineSymbol;
     let newCodeArray;
-    const { word, position } = getCurrentWord();
+    const { word, position } = getCurrentWord(arrayWithCode[codeActiveLine], lineCursorPosition);
     if (!letter.match(/\w|[А-я]/gm) || letter === 'Tab') {
-      newCodeArray = code.map((item, index) => {
-        if (index === activeLine) {
+      newCodeArray = arrayWithCode.map((item, index) => {
+        if (index === codeActiveLine) {
           const rightSide = item[word - 1].slice(position);
           let itemArray;
           const newLetter = letter === '{' ? ['{', '}'] : letter === 'Tab' ? [' ', ' '] : [letter];
@@ -142,12 +150,13 @@ export function Editor() {
           const filterArray = itemArray.filter((str) => str !== '');
           return filterArray.length ? filterArray : [''];
         }
-        return item;
+        return item.filter((str) => str !== '');
       });
     } else {
-      newCodeArray = code.map((item, index) => {
-        if (index === activeLine) {
+      newCodeArray = arrayWithCode.map((item, index) => {
+        if (index === codeActiveLine) {
           let addToCount = 0;
+          console.log(item);
           if (!item[word - 1].match(/\w|[А-я]/gm)) {
             item.splice(word, 0, '');
             addToCount += 1;
@@ -155,34 +164,48 @@ export function Editor() {
           const newLineArray = item[word + addToCount - 1].split('');
           newLineArray.splice(position, 0, letter);
           const newLine = newLineArray.join('');
-          const newItem = [
+          return [
             ...item.slice(0, word - 1 + addToCount),
             newLine,
             ...item.slice(word + addToCount),
           ];
-          return newItem;
         }
-        return item;
+        if (item.length === 1 && item[0] === '') {
+          return item;
+        } else {
+          return item.filter((str) => str !== '');
+        }
       });
     }
     if (letter === 'Tab') {
-      setActiveLineSymbol((prevState) => prevState + 2);
+      setActiveLineSymbol(lineCursorPosition + 2);
     } else {
-      setActiveLineSymbol((prevState) => prevState + 1);
+      setActiveLineSymbol(lineCursorPosition + 1);
     }
     updateCode(newCodeArray);
   };
 
-  const addNewLine = () => {
+  const addNewLine = (
+    array?: Array<Array<string>>,
+    newActiveLine?: number,
+    cursorPosition?: number
+  ) => {
     let newArray;
-    const lineLength = getActiveLineLength();
+    const arrayWithCode = array ?? code;
+    const codeActiveLine = newActiveLine ?? activeLine;
+    const lineCursorPosition = cursorPosition ?? activeLineSymbol;
+    const lineLength = getActiveLineLengthArr(codeActiveLine, arrayWithCode);
     if (activeLineSymbol === lineLength) {
-      newArray = [...code.slice(0, activeLine + 1), [''], ...code.slice(activeLine + 1)];
+      newArray = [
+        ...arrayWithCode.slice(0, codeActiveLine + 1),
+        [''],
+        ...arrayWithCode.slice(codeActiveLine + 1),
+      ];
     } else {
-      const { word, position } = getCurrentWord();
+      const { word, position } = getCurrentWord(arrayWithCode[codeActiveLine], lineCursorPosition);
       let restLine = [''];
-      newArray = code.map((item, index) => {
-        if (index === activeLine) {
+      newArray = arrayWithCode.map((item, index) => {
+        if (index === codeActiveLine) {
           const newLine = [
             ...item.slice(0, word - 1),
             item[word - 1].split('').slice(0, position).join(''),
@@ -197,10 +220,14 @@ export function Editor() {
         }
         return item;
       });
-      newArray.splice(activeLine + 1, 0, restLine);
+      if (!restLine.length) {
+        restLine = [''];
+      }
+      newArray.splice(codeActiveLine + 1, 0, restLine);
     }
-    setActiveLine((prevState) => prevState + 1);
+    setActiveLine(codeActiveLine + 1);
     setActiveLineSymbol(0);
+    console.log(newArray);
     updateCode(newArray);
   };
 
@@ -328,6 +355,22 @@ export function Editor() {
         currString.slice(activeLineSymbol),
       ].join('');
 
+      const wordsNew = getWords(currLineArr);
+
+      const newCodeArray = copyCode
+        .slice(0, activeLine)
+        .concat(wordsNew)
+        .concat(copyCode.slice(activeLine + 1));
+      setCode(newCodeArray);
+      setActiveLine(activeLine + words.length - 1);
+      setActiveLineSymbol(
+        words.length > 1
+          ? getActiveLineLengthArr(words.length - 1, words)
+          : activeLineSymbol + words[0].length - 1
+      );
+    }
+  };
+
   const setSelectionCode = (
     lineStart: number,
     wordStart: number,
@@ -348,7 +391,71 @@ export function Editor() {
         wordEndOffset,
       },
     };
-    console.log(selectionOptions);
+    setSelectionOptions(selectionOptions);
+  };
+
+  const getStartPartOfLine = (line: Array<string>, start: number, offset: number) => {
+    return [...line.slice(0, start), line[start].split('').slice(0, offset).join('')];
+  };
+
+  const getEndPartOfLine = (line: Array<string>, start: number, offset: number) => {
+    return [line[start].split('').slice(offset).join(''), ...line.slice(start + 1)];
+  };
+
+  const deleteSelectedText = () => {
+    if (selectionOptions) {
+      const newArray = code.filter(
+        (item, index) =>
+          index < selectionOptions.startSelection.lineStart ||
+          index > selectionOptions.endSelection.lineEnd
+      );
+      const lineStart = getStartPartOfLine(
+        code[selectionOptions.startSelection.lineStart],
+        selectionOptions.startSelection.wordStart,
+        selectionOptions.startSelection.wordStartOffset
+      );
+      const endLine = getEndPartOfLine(
+        code[selectionOptions.endSelection.lineEnd],
+        selectionOptions.endSelection.wordEnd,
+        selectionOptions.endSelection.wordEndOffset
+      );
+      let newLine;
+      if (lineStart.at(-1) === '') {
+        newLine = [...lineStart.slice(0, -1), ...endLine];
+      }
+      if (lineStart.at(-1) === ' ') {
+        newLine = [...lineStart, ...endLine];
+      }
+      if (lineStart.at(-1)?.match(/\w|[А-я]/gm)) {
+        if (endLine.length) {
+          newLine = [
+            ...lineStart.slice(0, -1),
+            lineStart[lineStart.length - 1] + endLine.at(0),
+            ...endLine.slice(1),
+          ];
+        } else {
+          newLine = [...lineStart];
+        }
+      }
+      if (lineStart.at(-1) === undefined) {
+        if (endLine) {
+          newLine = [...endLine];
+        } else {
+          newLine = [''];
+        }
+      }
+      if (newLine) {
+        newArray.splice(selectionOptions.startSelection.lineStart, 0, newLine);
+      } else {
+        console.error('New line is undefined!');
+      }
+      setActiveLine(selectionOptions.startSelection.lineStart);
+      const newActiveLine = selectionOptions.startSelection.lineStart;
+      const firstLineLength = lineStart.join('').length;
+      setActiveLineSymbol(firstLineLength);
+      updateCode(newArray);
+      return { newArray, newActiveLine, firstLineLength };
+    }
   };
 
   const mouseUpHandler = () => {
@@ -411,45 +518,53 @@ export function Editor() {
     }
     editorClickEvent();
   };
-
-      const wordsNew = getWords(currLineArr);
-
-      const newCodeArray = copyCode
-        .slice(0, activeLine)
-        .concat(wordsNew)
-        .concat(copyCode.slice(activeLine + 1));
-      setCode(newCodeArray);
-      setActiveLine(activeLine + words.length - 1);
-      setActiveLineSymbol(
-        words.length > 1
-          ? getActiveLineLengthArr(words.length - 1, words)
-          : activeLineSymbol + words[0].length - 1
-      );
-    }
-  };
   const inputEvent = async (e: React.KeyboardEvent) => {
     if (isFocus) {
-      if (e.key.length === 1) {
-        addNewLetter(e.key);
-      } else {
-        if (e.key === 'Enter') {
-          addNewLine();
+      if (!e.altKey && !e.ctrlKey) {
+        let newArray;
+        let newActiveLine;
+        let newCursorPosition;
+        if (selectionOptions && !window.getSelection()?.isCollapsed) {
+          const obj = deleteSelectedText();
+          if (obj) {
+            newArray = obj.newArray;
+            newActiveLine = obj.newActiveLine;
+            newCursorPosition = obj.firstLineLength;
+          }
+          window.getSelection()?.empty();
         }
-        if (e.key === 'Tab') {
-          e.preventDefault();
-          addNewLetter('Tab');
-        }
-        if (e.key === 'End') {
-          cursorToEnd();
-        }
-        if (e.key === 'Home') {
-          setActiveLineSymbol(0);
-        }
-        if (e.key.includes('Arrow')) {
-          arrowNavigation(e.key);
-        }
-        if (e.key === 'Backspace') {
-          deleteSymbol();
+        if (e.key.length === 1) {
+          addNewLetter(e.key, newArray, newActiveLine, newCursorPosition);
+        } else {
+          if (e.key === 'Enter') {
+            addNewLine(newArray, newActiveLine, newCursorPosition);
+          }
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            addNewLetter('Tab', newArray, newActiveLine, newCursorPosition);
+          }
+          if (e.key === 'End') {
+            cursorToEnd();
+          }
+          if (e.key === 'Home') {
+            setActiveLineSymbol(0);
+          }
+          if (e.key.includes('Arrow')) {
+            arrowNavigation(e.key);
+          }
+          if (e.key === 'Backspace') {
+            if (
+              newCursorPosition !== undefined &&
+              newArray !== undefined &&
+              newActiveLine !== undefined
+            ) {
+              updateCode(newArray);
+              setActiveLine(newActiveLine);
+              setActiveLineSymbol(newCursorPosition);
+            } else {
+              deleteSymbol();
+            }
+          }
         }
       }
     }
