@@ -3,6 +3,9 @@ import { Grid } from '@mui/material';
 import { EditorHeader } from '@/components/Editor/EditorHeader/EditorHeader';
 import { Editor } from '@/components/Editor/Editor/Editor';
 import { Response } from '@/components/Response/Response';
+import { useAppSelector } from '@/hooks/redux';
+import { useEffect, useState } from 'react';
+import { ITab } from '@/store/reducers/editorTabs/slice';
 
 export function EditorContainer() {
   return (
@@ -20,7 +23,7 @@ export function EditorContainer() {
           <div className="flex mt-[8px] min-h-[78vh] bg-white rounded-lg">
             <div className="p-8 grow">
               <EditorHeader />
-              <Editor />
+              <Editor isRequest={true} />
             </div>
           </div>
         </Grid>

@@ -2,17 +2,17 @@ import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 
 interface PayloadParams {
-  tabs: Array<tab>;
+  tabs: Array<ITab>;
   ids: Array<number>;
   count: number;
   activeTabId: number;
 }
 
-interface tab {
+export interface ITab {
   id: number;
   name: string;
-  requestCode: string;
-  responseCode: string;
+  requestCode: Array<Array<string>>;
+  responseCode: Array<Array<string>> | null;
 }
 
 const initialState: PayloadParams = {
@@ -20,14 +20,17 @@ const initialState: PayloadParams = {
     {
       id: 1,
       name: 'ExampleQuery',
-      requestCode: 'First',
-      responseCode: 'First',
-    },
-    {
-      id: 2,
-      name: 'ExampleQuery-2',
-      requestCode: 'second',
-      responseCode: 'Second',
+      requestCode: [
+        ['query', ' ', 'ExampleQuery', ' ', '{'],
+        [' ', ' ', 'company', '{'],
+        [' ', ' ', ' ', ' ', 'ceo'],
+        [' ', ' ', '}'],
+        [' ', ' ', 'roadster', ' ', '{'],
+        [' ', ' ', ' ', ' ', 'apoapsis', '_', 'au'],
+        [' ', ' ', '}'],
+        ['}'],
+      ],
+      responseCode: null,
     },
   ],
   ids: [1],
@@ -48,8 +51,8 @@ export const editorTabSlice = createSlice({
       state.tabs.push({
         id: newId,
         name: `Unnamed-${state.count}`,
-        requestCode: '',
-        responseCode: '',
+        requestCode: [['']],
+        responseCode: [['']],
       });
       state.count += 1;
       state.activeTabId = newId;
@@ -59,7 +62,6 @@ export const editorTabSlice = createSlice({
     },
     deleteTab: (state, action) => {
       const index = state.tabs.findIndex((item) => item.id == action.payload);
-      console.log(index);
       if (state.activeTabId == action.payload) {
         state.activeTabId =
           index === 1

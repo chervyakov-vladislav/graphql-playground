@@ -1,15 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/hooks/redux';
 import { ISelectionData } from '@/types/editorTypes';
+import { ITab } from '@/store/reducers/editorTabs/slice';
 
-export function Editor() {
+interface IProps {
+  isRequest: boolean;
+}
+
+export function Editor(props: IProps) {
+  const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
+  const [activeTabInfo, setActiveTabInfo] = useState<ITab[]>();
+
+  useEffect(() => {
+    const tabInfo = tabs.filter((item) => item.id == activeTabId);
+    if (tabInfo.length) {
+      setActiveTabInfo(tabInfo);
+    }
+  }, [activeTabId]);
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
   const [activeLine, setActiveLine] = useState(0);
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
-  const { tabs, activeTabId } = useAppSelector((state) => state.editorTab);
   const [isFocus, setIsFocus] = useState(false);
   const [selectionOptions, setSelectionOptions] = useState<ISelectionData | undefined>(undefined);
-  const [requestCode, setRequestCode] = useState('');
+
+  useEffect(() => {
+    let code;
+    if (props.isRequest) {
+      code = activeTabInfo?.at(0)?.requestCode ?? [['']];
+    } else {
+      code = activeTabInfo?.at(0)?.responseCode ?? [['']];
+    }
+    setCode(JSON.parse(JSON.stringify(code)));
+    setActiveLine(0);
+    setActiveLineSymbol(0);
+  }, [activeTabInfo]);
 
   let height = activeLine * 20;
   let left = activeLineSymbol * 9.7;
@@ -23,13 +47,6 @@ export function Editor() {
   useEffect(() => {
     left = activeLineSymbol * 9;
   }, [activeLineSymbol]);
-
-  useEffect(() => {
-    const item = tabs.find((item) => item.id == activeTabId);
-    if (item) {
-      setRequestCode(item.requestCode);
-    }
-  }, [activeTabId]);
 
   const focusEvent = () => {
     setIsFocus(true);
@@ -552,7 +569,7 @@ export function Editor() {
           if (e.key.includes('Arrow')) {
             arrowNavigation(e.key);
           }
-          if (e.key === 'Backspace') {
+          if (e.key === 'Backspace' || e.key === 'Delete') {
             if (
               newCursorPosition !== undefined &&
               newArray !== undefined &&
@@ -562,7 +579,9 @@ export function Editor() {
               setActiveLine(newActiveLine);
               setActiveLineSymbol(newCursorPosition);
             } else {
-              deleteSymbol();
+              if (e.key === 'Backspace') {
+                deleteSymbol();
+              }
             }
           }
         }
@@ -608,7 +627,7 @@ export function Editor() {
           </div>
         ))}
         <div
-          className={`absolute h-[24px] w-[2px] bg-black animate-blink-cursor ${
+          className={`absolute h-[24px] w-[2px] bg-black select-none animate-blink-cursor ${
             isFocus ? 'visible' : 'hidden'
           }`}
           style={{ top: `${height}px`, left: `${left}px` }}
