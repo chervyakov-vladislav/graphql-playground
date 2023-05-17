@@ -4,8 +4,10 @@ import { KindForm } from '@/types/enums';
 import Button from '@mui/material/Button';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 
 export const MainAuthBlock = () => {
+  const { t } = useTranslation();
   const { id } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -15,7 +17,7 @@ export const MainAuthBlock = () => {
     event.preventDefault();
     if (event.target instanceof HTMLButtonElement && event.target.name) {
       if (id) {
-        router.push('/graphql');
+        router.push(`/graphql`, `/graphql`, { locale: router.locale });
       } else {
         switch (event.target?.name) {
           case 'login':
@@ -25,7 +27,7 @@ export const MainAuthBlock = () => {
             dispatch(authActions.changeKindOfForm(KindForm.signin));
             break;
         }
-        router.push('/auth');
+        router.push(`/auth`, `/auth`, { locale: router.locale });
       }
     }
   };
@@ -34,12 +36,12 @@ export const MainAuthBlock = () => {
     <div>
       <div className={'px-[3.7%]'}>
         <h2 className={'font-SourceSansPro font-semibold text-4xl text-color-bright-black'}>
-          Welcome!
+          {t('welcome_page.form.welcome')}
         </h2>
       </div>
       <div className={'mb-14'}>
         <p className={'font-SourceSansPro max-w-[181px] text-sm leading-5 text-black my-0 mx-auto'}>
-          To start using the service, please log in with your account
+          {t('welcome_page.form.desc')}
         </p>
       </div>
       <Button
@@ -50,7 +52,7 @@ export const MainAuthBlock = () => {
           'bg-color-purple font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-color-border-dark-purple mb-[19px] hover:bg-color-hover-button-purple'
         }
       >
-        Log in
+        {t('welcome_page.form.login')}
       </Button>
       {!id && (
         <Button
@@ -61,7 +63,7 @@ export const MainAuthBlock = () => {
             'bg-transparent text-color-bright-black font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-transparent shadow-none hover:border-color-bright-black hover:bg-transparent'
           }
         >
-          Sign in
+          {t('welcome_page.form.signin')}
         </Button>
       )}
     </div>

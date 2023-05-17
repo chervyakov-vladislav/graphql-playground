@@ -1,13 +1,15 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import { Stack, Typography } from '@mui/material';
-import { LangSwitch } from '@/components/ui/LangSwitch/LangSwitch';
+import LangSwitch from '@/components/ui/LangSwitch/LangSwitch';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { KindForm } from '@/types/enums';
 import { authActions } from '@/store/reducers/auth/authSlice';
 import { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
 import { auth } from 'firebase.config';
+import { useTranslation } from 'next-i18next';
+
 interface IProps {
   isBurger: boolean;
   classes: string;
@@ -15,6 +17,7 @@ interface IProps {
 }
 
 const HeaderMenu = (props: IProps) => {
+  const { t } = useTranslation();
   const { kindOfForm, id, login } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -26,18 +29,18 @@ const HeaderMenu = (props: IProps) => {
       switch (event.target?.name) {
         case 'login':
           dispatch(authActions.changeKindOfForm(KindForm.login));
-          router.push('/auth');
+          router.push(`/auth`, `/auth`, { locale: router.locale });
 
           break;
         case 'logout':
           signOut(auth);
           dispatch(authActions.changeKindOfForm(KindForm.login));
           dispatch(authActions.removeUser());
-          router.push('/');
+          router.push(`/`, `/`, { locale: router.locale });
           break;
         case 'signin':
           dispatch(authActions.changeKindOfForm(KindForm.signin));
-          router.push('/auth');
+          router.push(`/auth`, `/auth`, { locale: router.locale });
           break;
       }
     }
@@ -62,7 +65,7 @@ const HeaderMenu = (props: IProps) => {
             className="bg-color-dark-blue font-semibold h-[28px] normal-case text-[14px] hover:bg-color-dark-blue-hover"
             onClick={handleClick}
           >
-            Log out
+            {t('header.logout')}
           </Button>
         </>
       ) : (
@@ -75,7 +78,7 @@ const HeaderMenu = (props: IProps) => {
             }`}
             onClick={handleClick}
           >
-            Sign in
+            {t('header.signin')}
           </Button>
           <Button
             name="login"
@@ -85,7 +88,7 @@ const HeaderMenu = (props: IProps) => {
             }`}
             onClick={handleClick}
           >
-            Log in
+            {t('header.login')}
           </Button>
         </>
       )}
@@ -99,7 +102,7 @@ const HeaderMenu = (props: IProps) => {
         }}
       >
         <Typography sx={{ color: '#ffffff' }}>ru</Typography>
-        <LangSwitch defaultChecked />
+        <LangSwitch />
         <Typography sx={{ color: '#ffffff' }}>en</Typography>
       </Stack>
     </Stack>

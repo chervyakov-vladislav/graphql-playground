@@ -13,16 +13,23 @@ import { FormAuthType } from '@/types/types';
 import { useAppDispatch } from '@/store/hooks';
 import { authActions } from '@/store/reducers/auth/authSlice';
 import { KindForm } from '@/types/enums';
-const validationSchem = yup.object({
-  email: yup.string().email('Enter a valid email').required('Email is required'),
-  password: yup.string().required('Password is required'),
-});
+import { useTranslation } from 'next-i18next';
 
 type Props = {
   onSubmit: (data: FormAuthType) => void;
 };
 
 const FormLogin = ({ onSubmit }: Props) => {
+  const { t } = useTranslation();
+  const validationSchem = yup.object({
+    email: yup
+      .string()
+      .email(t('auth_page.validations.email_valid') as yup.Message<{ regex: RegExp }>)
+      .required(t('auth_page.validations.email_required') as yup.Message<{ regex: RegExp }>),
+    password: yup
+      .string()
+      .required(t('auth_page.validations.password_required') as yup.Message<{ regex: RegExp }>),
+  });
   const methods = useForm<FormAuthType>({
     mode: 'all',
     resolver: yupResolver(validationSchem),
@@ -45,26 +52,26 @@ const FormLogin = ({ onSubmit }: Props) => {
       <FormProvider {...methods}>
         <Stack spacing={2}>
           <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-xl">Log in</h2>
+            <h2 className="font-semibold text-xl">{t('auth_page.title_log_in')}</h2>
             <p className="text-xs">
-              New user?{' '}
+              {t('auth_page.new_user_question')}{' '}
               <span
                 onClick={hadleChangeType}
                 className="cursor-pointer text-color-purple hover:underline decoration-1"
               >
-                Let&apos;s sign in
+                {t('auth_page.new_user_link')}
               </span>
             </p>
           </div>
 
           <TextFieldStyled
             name="email"
-            label="Email Address"
+            label={t('auth_page.placeholders.email')}
             image={<Image alt="" src={mailIcon} className="w-[1.2rem]" />}
           />
           <TextFieldStyled
             name="password"
-            label="Password"
+            label={t('auth_page.placeholders.pass')}
             type="password"
             image={<Image alt="" src={passwordIcon} className="w-[1rem]" />}
           />
@@ -74,7 +81,7 @@ const FormLogin = ({ onSubmit }: Props) => {
             variant="contained"
             className="bg-color-purple font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-color-border-dark-purple mb-[19px] hover:bg-color-hover-button-purple"
           >
-            Log in
+            {t('auth_page.log_in_btn')}
           </Button>
         </Stack>
       </FormProvider>

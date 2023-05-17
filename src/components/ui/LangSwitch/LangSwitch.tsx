@@ -1,7 +1,10 @@
 import { styled } from '@mui/material/styles';
 import { Switch } from '@mui/material';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import { useRef } from 'react';
 
-export const LangSwitch = styled(Switch)(({ theme }) => ({
+const StyledSwitch = styled(Switch)(({ theme }) => ({
   padding: 8,
   '& .MuiSwitch-switchBase': {
     padding: 10,
@@ -32,3 +35,18 @@ export const LangSwitch = styled(Switch)(({ theme }) => ({
     backgroundColor: '#566992',
   },
 }));
+
+export default function LangSwitch() {
+  const router = useRouter();
+  const { i18n } = useTranslation();
+  const routerLocale = router.locale || 'en';
+  const localeRef = useRef<string>(routerLocale);
+
+  const handleLang = () => {
+    localeRef.current = localeRef.current === 'en' ? 'ru' : 'en';
+    i18n.changeLanguage(localeRef.current);
+    router.push(router.pathname, router.asPath, { locale: localeRef.current });
+  };
+
+  return <StyledSwitch checked={localeRef.current === 'en'} onClick={handleLang} />;
+}

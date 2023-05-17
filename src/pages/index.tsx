@@ -6,14 +6,18 @@ import { MainCodeRequest } from '@/components/Main/MainCodeRequest/MainCodeReque
 import { MainCodeResponce } from '@/components/Main/MainCodeResponce/MainCodeResponce';
 import { MainAuthBlock } from '@/components/Main/MainAuthBlock/MainAuthBlock';
 import GraphLogoBlock from '@/components/GraphLogoBlock/GraphLogoBlock';
+import { wrapper } from '@/store/store';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 const Home = () => {
+  const { t } = useTranslation();
   const request = {
-    header: 'Ask for what you want',
+    header: t('welcome_page.ask_for'),
     codeBlock: <MainCodeRequest />,
   };
   const response = {
-    header: 'Get predictable results',
+    header: t('welcome_page.get_results'),
     codeBlock: <MainCodeResponce />,
   };
   return (
@@ -36,5 +40,13 @@ const Home = () => {
     </div>
   );
 };
+
+export const getServerSideProps = wrapper.getServerSideProps(() => async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'], null, ['en', 'ru'])),
+    },
+  };
+});
 
 export default Home;

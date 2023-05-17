@@ -7,7 +7,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:prettier/recommended',
     'next',
-    'next/core-web-vitals'
+    'next/core-web-vitals',
   ],
   env: {
     browser: true,
@@ -41,6 +41,7 @@ module.exports = {
     '@typescript-eslint/no-var-reqiures': 'off',
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
+    '@typescript-eslint/no-var-requires': 0,
   },
   settings: {
     react: {

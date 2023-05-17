@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '@/store/store';
 import { HYDRATE } from 'next-redux-wrapper';
-import { ActionHydrate, Data, Fields, Args, NavObj } from '@/types/schema-types';
+import { Data, Fields, Args, NavObj } from '@/types/schema-types';
 
 interface InitialState {
   nav: NavObj[];
@@ -63,17 +63,20 @@ export const documentSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(HYDRATE, (state, action) => {
-      if ((action as ActionHydrate).payload.document.nav) {
-        state.nav = (action as ActionHydrate).payload.document.nav;
-      }
+    builder.addCase<typeof HYDRATE, PayloadAction<RootState, typeof HYDRATE>>(
+      HYDRATE,
+      (state, action) => {
+        if (action.payload.document.nav) {
+          state.nav = action.payload.document.nav;
+        }
 
-      if ((action as ActionHydrate).payload.document.schema) {
-        state.schema = (action as ActionHydrate).payload.document.schema;
-      }
+        if (action.payload.document.schema) {
+          state.schema = action.payload.document.schema;
+        }
 
-      return state;
-    });
+        return state;
+      }
+    );
   },
 });
 
