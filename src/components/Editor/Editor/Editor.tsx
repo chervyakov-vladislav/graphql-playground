@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/hooks/redux';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 export function Editor() {
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
@@ -83,6 +84,10 @@ export function Editor() {
   const getActiveLineLength = (line?: number) => {
     const lineToCalc = line ?? activeLine;
     return code[lineToCalc].reduce((acc, item) => acc + item.length, 0);
+  };
+  const getActiveLineLengthArr = (line: number, array: Array<Array<string>>) => {
+    const lineToCalc = line ?? activeLine;
+    return array[lineToCalc].reduce((acc, item) => acc + item.length, 0);
   };
 
   const getCurrentWord = () => {
@@ -215,6 +220,13 @@ export function Editor() {
           activeLineSymbol + 1 > getActiveLineLength() ? activeLineSymbol : activeLineSymbol + 1
         );
         break;
+      case 'Home':
+        setActiveLineSymbol(0);
+        break;
+      case 'End':
+        setActiveLineSymbol(getActiveLineLength());
+
+        break;
     }
   };
 
@@ -285,7 +297,52 @@ export function Editor() {
       }
     }
   };
+  const getWords = (text: string) => {
+    const strings = text.split(/\r?\n/);
+    const words = strings.map((st) => st.replace(/ /g, '  ').trim().split(/\s/));
+    words.forEach(
+      (word, index, arr) =>
+        (arr[index] = word.map((elem) => (elem.length == 0 ? elem.replace('', ' ') : elem)))
+    );
+    return words;
+  };
+  const pasteHandler = (e: React.ClipboardEvent) => {
+    const text = e.clipboardData.getData('text').trim();
+    const words = getWords(text);
+    const copyCode = JSON.parse(JSON.stringify(code));
 
+    if (copyCode.length == 1 && copyCode[0] == '') {
+      setCode(words);
+      setActiveLine(words.length - 1);
+      setActiveLineSymbol(getActiveLineLengthArr(words.length - 1, words));
+    } else if (copyCode.length - 1 == activeLine) {
+      const newArr = copyCode.concat(words);
+      setActiveLine(newArr.length - 1);
+      setActiveLineSymbol(getActiveLineLengthArr(newArr.length - 1, newArr));
+      setCode(newArr);
+    } else {
+      const currString = copyCode[activeLine].join('');
+      const currLineArr = [
+        currString.slice(0, activeLineSymbol),
+        text,
+        currString.slice(activeLineSymbol),
+      ].join('');
+
+      const wordsNew = getWords(currLineArr);
+
+      const newCodeArray = copyCode
+        .slice(0, activeLine)
+        .concat(wordsNew)
+        .concat(copyCode.slice(activeLine + 1));
+      setCode(newCodeArray);
+      setActiveLine(activeLine + words.length - 1);
+      setActiveLineSymbol(
+        words.length > 1
+          ? getActiveLineLengthArr(words.length - 1, words)
+          : activeLineSymbol + words[0].length - 1
+      );
+    }
+  };
   const inputEvent = async (e: React.KeyboardEvent) => {
     if (isFocus) {
       if (e.key.length === 1) {
@@ -333,6 +390,7 @@ export function Editor() {
         onFocus={focusEvent}
         onBlur={blurEvent}
         onKeyDown={inputEvent}
+        onPaste={pasteHandler}
         onClick={editorClickEvent}
       >
         {code.map((item, index) => (
