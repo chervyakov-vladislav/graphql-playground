@@ -12,19 +12,21 @@ export const Response = () => {
 
   useLayoutEffect(() => {
     getResp({ query, variables: variables ? variables : undefined });
-  }, []);
-
-  useEffect(() => {
-    if (isSuccess) {
-      console.log(prettifyResponse(JSON.stringify(data, null, '  ')));
-    }
-  }, [data]);
+  }, [query]);
 
   return (
     <div className="flex mt-[8px] min-h-[78vh]">
       <div className="p-8 grow">
         <h3 className="text-black m-0 p-0 font-SourceSansPro">Response</h3>
-        {isLoading ? <div>skeleton loading</div> : <div>response</div>}
+        {isLoading ? (
+          <div>skeleton loading</div>
+        ) : isSuccess ? (
+          <pre className="break-all whitespace-pre-wrap">
+            {data ? JSON.stringify(data, null, '  ') : 'data template'}
+          </pre>
+        ) : (
+          <>Errors in response</>
+        )}
       </div>
     </div>
   );
