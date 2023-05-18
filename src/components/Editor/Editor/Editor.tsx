@@ -375,7 +375,7 @@ export function Editor(props: IProps) {
   };
   const getWords = (text: string) => {
     const strings = text.split(/\r?\n/);
-    const words = strings.map((st) => st.replace(/ /g, '  ').trim().split(/\s/));
+    const words = strings.map((st) => st.replace(/ /g, '  ').split(/\s/));
     words.forEach(
       (word, index, arr) =>
         (arr[index] = word.map((elem) => (elem.length == 0 ? elem.replace('', ' ') : elem)))
@@ -623,7 +623,7 @@ export function Editor(props: IProps) {
     }
   };
   return (
-    <div className="flex h-full max-w-full">
+    <div className="flex h-full h-[65vh] overflow-auto">
       <div className="text-black pr-3">
         {code.map((item, index) => (
           <div
