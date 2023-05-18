@@ -11,6 +11,16 @@ module.exports = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        blink: {
+          '0%': { opacity: 1 },
+          '50%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+      },
+      animation: {
+        'blink-cursor': 'blink 1s linear infinite',
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
@@ -26,12 +36,15 @@ module.exports = {
         'color-dark-blue-hover': '#003D5B',
         'color-heading-border': '#DEE2E7',
         'color-documentation-primary': '#191C23',
+        'color-inactive-tab': '#cad0d8',
         'color-documentation-secondary': '#5A6270',
         'color-light-gray': '#f3f4f6',
         'color-text-bright-red': '#ff6b98',
         'color-text-red': '#d2054e',
         'color-text-orange': '#ca9800',
         'color-text-green': '#00c773',
+        'color-code-active': '#2a3b81',
+        'color-code': '#969da8',
       },
       fontFamily: {
         SourceSansPro: ['Source Sans Pro', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
@@ -39,5 +52,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
 };

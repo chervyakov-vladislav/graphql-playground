@@ -4,6 +4,7 @@ import { createWrapper } from 'next-redux-wrapper';
 import { graphQl } from './api';
 import documentReducer from './reducers/document/slice';
 import editorReducer from './reducers/editor/slice';
+import editorTabReducer from './reducers/editorTabs/slice';
 import authReducer from './reducers/auth/authSlice';
 
 type TypeToolkitRaw = typeof toolkitRaw & { default?: unknown };
@@ -13,6 +14,7 @@ const { combineReducers, configureStore } = ((toolkitRaw as TypeToolkitRaw).defa
 const rootReducer = combineReducers({
   document: documentReducer,
   editor: editorReducer,
+  editorTab: editorTabReducer,
   auth: authReducer,
   [graphQl.reducerPath]: graphQl.reducer,
 });
