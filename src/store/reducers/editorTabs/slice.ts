@@ -26,7 +26,7 @@ const initialState: PayloadParams = {
         [' ', ' ', ' ', ' ', 'ceo'],
         [' ', ' ', '}'],
         [' ', ' ', 'roadster', ' ', '{'],
-        [' ', ' ', ' ', ' ', 'apoapsis', '_', 'au'],
+        [' ', ' ', ' ', ' ', 'apoapsis_au'],
         [' ', ' ', '}'],
         ['}'],
       ],

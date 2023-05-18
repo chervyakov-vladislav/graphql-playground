@@ -132,7 +132,7 @@ export function Editor(props: IProps) {
     const lineCursorPosition = cursorPosition ?? activeLineSymbol;
     let newCodeArray;
     const { word, position } = getCurrentWord(arrayWithCode[codeActiveLine], lineCursorPosition);
-    if (!letter.match(/\w|[А-я]/gm) || letter === 'Tab') {
+    if (!letter.match(/\w|[А-я|$|_]/gm) || letter === 'Tab') {
       newCodeArray = arrayWithCode.map((item, index) => {
         if (index === codeActiveLine) {
           const rightSide = item[word - 1].slice(position);
@@ -173,8 +173,7 @@ export function Editor(props: IProps) {
       newCodeArray = arrayWithCode.map((item, index) => {
         if (index === codeActiveLine) {
           let addToCount = 0;
-          console.log(item);
-          if (!item[word - 1].match(/\w|[А-я]/gm)) {
+          if (!item[word - 1].match(/\w|[А-я|$|_]/gm)) {
             item.splice(word, 0, '');
             addToCount += 1;
           }
@@ -244,7 +243,6 @@ export function Editor(props: IProps) {
     }
     setActiveLine(codeActiveLine + 1);
     setActiveLineSymbol(0);
-    console.log(newArray);
     updateCode(newArray);
   };
 
@@ -307,7 +305,6 @@ export function Editor(props: IProps) {
               newLine = [...item.slice(0, word - 1), ...item.slice(word)];
             }
             setActiveLineSymbol((prevState) => prevState - 1);
-            console.log(newLine);
             if (newLine.length === 0) {
               newLine = [''];
             }
@@ -334,7 +331,6 @@ export function Editor(props: IProps) {
           ];
         }
         const newArray = [...code.slice(0, activeLine - 1), newLine, ...code.slice(activeLine + 1)];
-        console.log(getActiveLineLength(activeLine - 1));
         setActiveLineSymbol(getActiveLineLength(activeLine - 1));
         setActiveLine((prevState) => prevState - 1);
         updateCode(newArray);
@@ -608,7 +604,6 @@ export function Editor(props: IProps) {
         onFocus={focusEvent}
         onBlur={blurEvent}
         onKeyDown={inputEvent}
-        // onClick={editorClickEvent}
         onMouseUpCapture={mouseUpHandler}
         onPaste={pasteHandler}
       >
