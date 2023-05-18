@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@/hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { ISelectionData } from '@/types/editorTypes';
-import { ITab } from '@/store/reducers/editorTabs/slice';
+import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 
 interface IProps {
   isRequest: boolean;
@@ -10,6 +10,8 @@ interface IProps {
 export function Editor(props: IProps) {
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
   const [activeTabInfo, setActiveTabInfo] = useState<ITab[]>();
+  const dispatch = useAppDispatch();
+  const [code, setCode] = useState<Array<Array<string>>>([['']]);
 
   useEffect(() => {
     const tabInfo = tabs.filter((item) => item.id == activeTabId);
@@ -17,7 +19,11 @@ export function Editor(props: IProps) {
       setActiveTabInfo(tabInfo);
     }
   }, [activeTabId]);
-  const [code, setCode] = useState<Array<Array<string>>>([['']]);
+
+  useEffect(() => {
+    dispatch(updateActiveTab(code));
+    console.log('dispatched');
+  }, [code]);
   const [activeLine, setActiveLine] = useState(0);
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
   const [isFocus, setIsFocus] = useState(false);
@@ -174,7 +180,7 @@ export function Editor(props: IProps) {
         if (index === codeActiveLine) {
           let addToCount = 0;
           if (!item[word - 1].match(/\w|[А-я|$|_]/gm)) {
-            item.splice(word, 0, '');
+            item = [...item.slice(0, word + 1), '', ...item.slice(word + 1, 0)];
             addToCount += 1;
           }
           const newLineArray = item[word + addToCount - 1].split('');

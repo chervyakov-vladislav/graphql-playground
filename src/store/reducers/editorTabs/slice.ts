@@ -78,11 +78,20 @@ export const editorTabSlice = createSlice({
         state.tabs.push(...initialState.tabs);
       }
     },
+    updateActiveTab: (state, action) => {
+      const newCode = action.payload ?? [['']];
+      state.tabs = state.tabs.map((item) => {
+        if (item.id == state.activeTabId) {
+          item.requestCode = newCode;
+        }
+        return item;
+      });
+    },
   },
 });
 
 export const selectEditor = (state: RootState) => state.editorTab;
 
-export const { addTab } = editorTabSlice.actions;
+export const { addTab, updateActiveTab } = editorTabSlice.actions;
 
 export default editorTabSlice.reducer;
