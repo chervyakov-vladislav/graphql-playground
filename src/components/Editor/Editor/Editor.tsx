@@ -276,7 +276,7 @@ export function Editor(props: IProps) {
     setActiveLineSymbol(getActiveLineLength());
   };
 
-  const deleteSymbol = () => {
+  const backspaceSymbol = () => {
     const lineLength = getActiveLineLength();
     const { word, position } = getCurrentWord();
     if (lineLength === 0) {
@@ -333,6 +333,42 @@ export function Editor(props: IProps) {
         const newArray = [...code.slice(0, activeLine - 1), newLine, ...code.slice(activeLine + 1)];
         setActiveLineSymbol(getActiveLineLength(activeLine - 1));
         setActiveLine((prevState) => prevState - 1);
+        updateCode(newArray);
+      }
+    }
+  };
+
+  const deleteSymbol = () => {
+    const lineLength = getActiveLineLength();
+    const { word, position } = getCurrentWord();
+    if (activeLine == code.length - 1 && activeLineSymbol == lineLength) {
+      return;
+    } else {
+      if (activeLineSymbol == lineLength) {
+        const newString = [...code[activeLine], ...code[activeLine + 1]];
+        const newArray = [...code.slice(0, activeLine), newString, ...code.slice(activeLine + 2)];
+        updateCode(newArray);
+      } else {
+        const line = code[activeLine];
+        const editWord = [
+          line[word - 1].slice(0, position),
+          line[word - 1].slice(position + 1),
+        ].join('');
+        let newLine;
+        if (editWord == line[word - 1]) {
+          const newString = line[word].split('').slice(1).join('');
+          if (newString === ' ') {
+            newLine = [...line.slice(0, word), ...line.slice(word + 1)];
+          }
+          newLine = [...line.slice(0, word), newString, ...line.slice(word + 1)];
+        } else {
+          newLine = [...line.slice(0, word - 1), editWord, ...line.slice(word)];
+        }
+        newLine = newLine.filter((str) => str !== '');
+        if (!newLine.length) {
+          newLine = [''];
+        }
+        const newArray = [...code.slice(0, activeLine), newLine, ...code.slice(activeLine + 1)];
         updateCode(newArray);
       }
     }
@@ -576,6 +612,8 @@ export function Editor(props: IProps) {
               setActiveLineSymbol(newCursorPosition);
             } else {
               if (e.key === 'Backspace') {
+                backspaceSymbol();
+              } else {
                 deleteSymbol();
               }
             }
@@ -585,7 +623,7 @@ export function Editor(props: IProps) {
     }
   };
   return (
-    <div className="flex h-full">
+    <div className="flex h-full max-w-full">
       <div className="text-black pr-3">
         {code.map((item, index) => (
           <div
@@ -600,7 +638,7 @@ export function Editor(props: IProps) {
       </div>
       <div
         tabIndex={0}
-        className="text-black min-h-[500px] h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
+        className="text-black max-w-full min-h-[500px] h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
         onFocus={focusEvent}
         onBlur={blurEvent}
         onKeyDown={inputEvent}
@@ -609,7 +647,7 @@ export function Editor(props: IProps) {
       >
         {code.map((item, index) => (
           <div
-            className="min-h-[20px] whitespace-pre cursor-text truncate"
+            className="min-h-[20px] whitespace-pre cursor-text overflow-hidden  max-w-full"
             key={index}
             data-line={index}
             onClick={clickNavigation}

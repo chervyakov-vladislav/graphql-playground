@@ -21,7 +21,7 @@ export function EditorContainer() {
       >
         <Grid item sm={6} xs={12}>
           <div className="flex mt-[8px] min-h-[78vh] bg-white rounded-lg">
-            <div className="p-8 grow">
+            <div className="p-8 grow max-w-full">
               <EditorHeader />
               <Editor isRequest={true} />
             </div>

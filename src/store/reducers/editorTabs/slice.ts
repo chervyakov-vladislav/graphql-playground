@@ -22,7 +22,7 @@ const initialState: PayloadParams = {
       name: 'ExampleQuery',
       requestCode: [
         ['query', ' ', 'ExampleQuery', ' ', '{'],
-        [' ', ' ', 'company', '{'],
+        [' ', ' ', 'company', ' ', '{'],
         [' ', ' ', ' ', ' ', 'ceo'],
         [' ', ' ', '}'],
         [' ', ' ', 'roadster', ' ', '{'],
