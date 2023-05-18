@@ -12,10 +12,10 @@ const Columns = () => {
       alignItems="flex-start"
       className="pl-[2%]"
     >
-      <Grid item sm={4} xs={12} className="flex flex-col pt-12">
+      <Grid item xl={3} xs={12} className="flex flex-col pt-12">
         <Documentaion />
       </Grid>
-      <Grid item sm={8} xs={12}>
+      <Grid item xl={9} xs={12}>
         <EditorContainer />
       </Grid>
     </Grid>
