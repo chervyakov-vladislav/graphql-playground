@@ -180,7 +180,7 @@ export function Editor(props: IProps) {
         if (index === codeActiveLine) {
           let addToCount = 0;
           if (!item[word - 1].match(/\w|[А-я|$|_]/gm)) {
-            item = [...item.slice(0, word + 1), '', ...item.slice(word + 1, 0)];
+            item = [...item.slice(0, word), '', ...item.slice(word)];
             addToCount += 1;
           }
           const newLineArray = item[word + addToCount - 1].split('');
