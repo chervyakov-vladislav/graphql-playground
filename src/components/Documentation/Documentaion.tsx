@@ -4,7 +4,6 @@ import SchemaNaviagation from './SchemaNavigation/SchemaNaviagation';
 import BackButton from './BackButton/BackButton';
 import Arguments from './Arguments/Arguments';
 import Fields from './Fields/Fields';
-import { useGetDataMutation } from '@/store/api';
 import Root from './Root/Root';
 
 import { useAppSelector } from '@/store/hooks';
@@ -12,23 +11,6 @@ import { selectDocument } from '@/store/reducers/document/slice';
 
 const Documentaion = () => {
   const { isRoot } = useAppSelector(selectDocument);
-  const QUERY = {
-    query: `{
-    __schema {
-      queryType {
-        fields {
-          name
-        }
-      }
-    }
-  }`,
-  };
-
-  const [getData, { data }] = useGetDataMutation();
-
-  const handleClick = () => {
-    getData(QUERY);
-  };
 
   return (
     <>
@@ -51,10 +33,6 @@ const Documentaion = () => {
           <BackButton />
           <Arguments />
           <Fields />
-          <Button onClick={handleClick}>Загрузить</Button>
-          <pre className="break-all whitespace-pre-wrap">
-            {data ? JSON.stringify(data, null, '  ') : 'data template'}
-          </pre>
         </div>
       )}
     </>
