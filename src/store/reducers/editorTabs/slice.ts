@@ -4,7 +4,7 @@ import { RootState } from '../../store';
 interface PayloadParams {
   tabs: Array<ITab>;
   ids: Array<number>;
-  count: number;
+  unnamedCount: number;
   activeTabId: number;
 }
 
@@ -35,7 +35,7 @@ const initialState: PayloadParams = {
     },
   ],
   ids: [1],
-  count: 1,
+  unnamedCount: 1,
   activeTabId: 1,
 };
 
@@ -43,19 +43,22 @@ export const editorTabSlice = createSlice({
   name: 'editorTabs',
   initialState,
   reducers: {
-    addTab: (state) => {
+    addTab: (state, action) => {
       let newId = 1;
       while (state.ids.includes(newId)) {
         newId += 1;
       }
       state.ids.push(newId);
+      const name = action.payload === '' ? `Unnamed-${state.unnamedCount}` : action.payload;
+      if (name.includes('Unnamed')) {
+        state.unnamedCount += 1;
+      }
       state.tabs.push({
         id: newId,
-        name: `Unnamed-${state.count}`,
+        name,
         requestCode: [['']],
         responseCode: [['']],
       });
-      state.count += 1;
       state.activeTabId = newId;
     },
     setActiveTab: (state, action) => {
@@ -66,7 +69,7 @@ export const editorTabSlice = createSlice({
       if (state.activeTabId == action.payload) {
         state.activeTabId =
           index === 1
-            ? state.tabs[1]?.id
+            ? state.tabs[0]?.id
             : state.tabs?.[index + 1]
             ? state.tabs?.[index + 1]?.id
             : state.tabs?.[index - 1]?.id

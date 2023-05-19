@@ -14,6 +14,7 @@ export function Editor(props: IProps) {
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
 
   useEffect(() => {
+    console.log(activeTabId);
     const tabInfo = tabs.filter((item) => item.id == activeTabId);
     if (tabInfo.length) {
       setActiveTabInfo(tabInfo);
@@ -22,7 +23,6 @@ export function Editor(props: IProps) {
 
   useEffect(() => {
     dispatch(updateActiveTab(code));
-    console.log('dispatched');
   }, [code]);
   const [activeLine, setActiveLine] = useState(0);
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);

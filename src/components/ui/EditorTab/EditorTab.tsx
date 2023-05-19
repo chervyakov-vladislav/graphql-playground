@@ -24,13 +24,15 @@ const EditorTab = (props: IProps) => {
 
   return (
     <div
-      className={`font-SourceSansPro py-[6px] pl-[13px] pr-[33px] mr-2 border-[1px] relative border-solid border-color-heading-border border-b-0 rounded-tl-lg rounded-tr-lg cursor-pointer ${
+      className={`font-SourceSansPro max-w-[150px] py-[6px] pl-[13px] pr-[33px] mr-2 border-[1px] relative border-solid border-color-heading-border border-b-0 rounded-tl-lg rounded-tr-lg cursor-pointer ${
         props.id === Number(activeTabId) ? 'bg-transparent' : 'bg-color-inactive-tab'
       }`}
       id={String(props.id)}
       onClick={changeActiveTab}
     >
-      <p className={'m-0 p-0 text-color-documentation-primary text-base whitespace-nowrap'}>
+      <p
+        className={'m-0 p-0 text-color-documentation-primary text-base whitespace-nowrap truncate'}
+      >
         {props.name}
       </p>
       <div className="absolute top-0 bottom-0 right-[7px] flex justify-center items-center">

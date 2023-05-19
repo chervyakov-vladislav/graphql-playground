@@ -24,7 +24,6 @@ export function EditorContainer() {
             </div>
           </div>
         </Grid>
-
         <Grid item md={6} xs={12}>
           <Response />
         </Grid>
