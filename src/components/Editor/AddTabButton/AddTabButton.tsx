@@ -3,11 +3,13 @@ import React from 'react';
 import { useAppDispatch } from '@/hooks/redux';
 import { editorTabSlice } from '@/store/reducers/editorTabs/slice';
 
-export function AddTabButton() {
-  const dispatch = useAppDispatch();
-  const { addTab } = editorTabSlice.actions;
+interface IProps {
+  modalOpenFnc: () => void;
+}
+
+export function AddTabButton(props: IProps) {
   const addItem = () => {
-    dispatch(addTab());
+    props.modalOpenFnc();
   };
 
   return (

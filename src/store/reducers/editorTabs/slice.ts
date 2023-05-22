@@ -1,10 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 
 interface PayloadParams {
   tabs: Array<ITab>;
   ids: Array<number>;
-  count: number;
+  unnamedCount: number;
   activeTabId: number;
 }
 
@@ -12,7 +12,7 @@ export interface ITab {
   id: number;
   name: string;
   requestCode: Array<Array<string>>;
-  responseCode: Array<Array<string>> | null;
+  responseCode: string | null;
 }
 
 const initialState: PayloadParams = {
@@ -35,7 +35,7 @@ const initialState: PayloadParams = {
     },
   ],
   ids: [1],
-  count: 1,
+  unnamedCount: 1,
   activeTabId: 1,
 };
 
@@ -43,19 +43,22 @@ export const editorTabSlice = createSlice({
   name: 'editorTabs',
   initialState,
   reducers: {
-    addTab: (state) => {
+    addTab: (state, action) => {
       let newId = 1;
       while (state.ids.includes(newId)) {
         newId += 1;
       }
       state.ids.push(newId);
+      const name = action.payload === '' ? `Unnamed-${state.unnamedCount}` : action.payload;
+      if (name.includes('Unnamed')) {
+        state.unnamedCount += 1;
+      }
       state.tabs.push({
         id: newId,
-        name: `Unnamed-${state.count}`,
+        name,
         requestCode: [['']],
-        responseCode: [['']],
+        responseCode: null,
       });
-      state.count += 1;
       state.activeTabId = newId;
     },
     setActiveTab: (state, action) => {
@@ -66,7 +69,7 @@ export const editorTabSlice = createSlice({
       if (state.activeTabId == action.payload) {
         state.activeTabId =
           index === 1
-            ? state.tabs[1]?.id
+            ? state.tabs[0]?.id
             : state.tabs?.[index + 1]
             ? state.tabs?.[index + 1]?.id
             : state.tabs?.[index - 1]?.id
@@ -78,11 +81,30 @@ export const editorTabSlice = createSlice({
         state.tabs.push(...initialState.tabs);
       }
     },
-    updateActiveTab: (state, action) => {
-      const newCode = action.payload ?? [['']];
+    updateActiveTab: (
+      state,
+      action: PayloadAction<{
+        code: Array<Array<string>> | string;
+        isRequest: boolean;
+        activeId?: number;
+      }>
+    ) => {
+      const activeTab = action.payload.activeId ?? state.activeTabId;
+      let newCode: Array<Array<string>> | string;
+      if (action.payload.isRequest) {
+        newCode = action.payload.code ?? [['']];
+      } else {
+        newCode = action.payload.code ?? '';
+      }
       state.tabs = state.tabs.map((item) => {
-        if (item.id == state.activeTabId) {
-          item.requestCode = newCode;
+        if (item.id == activeTab) {
+          if (action.payload.isRequest && Array.isArray(newCode)) {
+            item.requestCode = newCode;
+          } else {
+            if (typeof newCode === 'string') {
+              item.responseCode = newCode;
+            }
+          }
         }
         return item;
       });

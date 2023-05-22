@@ -6,16 +6,16 @@ interface PayloadParams {
   variables?: string;
 }
 
-const MOCK_QUERY = /* GraphQL */ `
-  {
-    users(limit: 6) {
-      name
-    }
-  }
-`;
+// const MOCK_QUERY = /* GraphQL */ `
+//   {
+//     users(limit: 6) {
+//       name
+//     }
+//   }
+// `;
 
 const initialState: PayloadParams = {
-  query: MOCK_QUERY,
+  query: '',
   variables: '',
 };
 

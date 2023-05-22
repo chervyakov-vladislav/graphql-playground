@@ -3,6 +3,7 @@ import { Grid } from '@mui/material';
 import { EditorHeader } from '@/components/Editor/EditorHeader/EditorHeader';
 import { Editor } from '@/components/Editor/Editor/Editor';
 import { Response } from '@/components/Response/Response';
+import { ResponseHeader } from '@/components/ResponseHeader/ResponseHeader';
 
 export function EditorContainer() {
   return (
@@ -20,13 +21,17 @@ export function EditorContainer() {
           <div className="flex mt-[10px] min-h-[78vh] bg-white rounded-lg">
             <div className="p-8 grow">
               <EditorHeader />
-              <Editor isRequest={true} />
+              <Editor />
             </div>
           </div>
         </Grid>
-
         <Grid item md={6} xs={12}>
-          <Response />
+          <div className="flex mt-[8px]">
+            <div className="p-8 grow text-black font-SourceSansPro">
+              <ResponseHeader />
+              <Response />
+            </div>
+          </div>
         </Grid>
       </Grid>
     </div>
