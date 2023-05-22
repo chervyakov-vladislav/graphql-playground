@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setQueryBody } from '@/store/reducers/editor/slice';
+import { setQuery } from '@/store/reducers/editor/slice';
 import { joinTextFromArr } from '@/utils/textFotmatter';
 
 export const EditorHeader = () => {
@@ -21,7 +21,7 @@ export const EditorHeader = () => {
     if (tabInfo) {
       const requestCode = joinTextFromArr(tabInfo.requestCode);
 
-      dispatch(setQueryBody(requestCode));
+      dispatch(setQuery({ query: requestCode, variables: tabInfo.variablesCode }));
     }
   };
   return (

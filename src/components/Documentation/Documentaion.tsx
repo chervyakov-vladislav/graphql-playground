@@ -1,10 +1,9 @@
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 import SchemaNaviagation from './SchemaNavigation/SchemaNaviagation';
 import BackButton from './BackButton/BackButton';
 import Arguments from './Arguments/Arguments';
 import Fields from './Fields/Fields';
-import { useGetDataMutation } from '@/store/api';
 import Root from './Root/Root';
 
 import { useAppSelector } from '@/store/hooks';
