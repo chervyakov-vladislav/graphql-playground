@@ -1,12 +1,24 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { setQueryVariables } from '@/store/reducers/editor/slice';
+import { setVars } from '@/store/reducers/editorTabs/slice';
 import { Accordion, AccordionDetails, AccordionSummary, TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 const EditorVars = () => {
-  const { variables } = useAppSelector((state) => state.editor);
+  const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
+  const [variables, setVariables] = useState('');
+
+  useEffect(() => {
+    const tabInfo = tabs.find((item) => item.id == activeTabId);
+    if (tabInfo) setVariables(tabInfo.variablesCode);
+  }, [activeTabId]);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(setVars(variables));
+  }, [variables]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setQueryVariables(e.target.value));
+    setVariables(e.target.value);
   };
   return (
     <Accordion>
