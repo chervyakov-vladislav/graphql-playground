@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 
 interface PayloadParams {
@@ -12,7 +12,7 @@ export interface ITab {
   id: number;
   name: string;
   requestCode: Array<Array<string>>;
-  responseCode: Array<Array<string>> | null;
+  responseCode: string | null;
 }
 
 const initialState: PayloadParams = {
@@ -57,7 +57,7 @@ export const editorTabSlice = createSlice({
         id: newId,
         name,
         requestCode: [['']],
-        responseCode: [['']],
+        responseCode: null,
       });
       state.activeTabId = newId;
     },
@@ -81,11 +81,30 @@ export const editorTabSlice = createSlice({
         state.tabs.push(...initialState.tabs);
       }
     },
-    updateActiveTab: (state, action) => {
-      const newCode = action.payload ?? [['']];
+    updateActiveTab: (
+      state,
+      action: PayloadAction<{
+        code: Array<Array<string>> | string;
+        isRequest: boolean;
+        activeId?: number;
+      }>
+    ) => {
+      const activeTab = action.payload.activeId ?? state.activeTabId;
+      let newCode: Array<Array<string>> | string;
+      if (action.payload.isRequest) {
+        newCode = action.payload.code ?? [['']];
+      } else {
+        newCode = action.payload.code ?? '';
+      }
       state.tabs = state.tabs.map((item) => {
-        if (item.id == state.activeTabId) {
-          item.requestCode = newCode;
+        if (item.id == activeTab) {
+          if (action.payload.isRequest && Array.isArray(newCode)) {
+            item.requestCode = newCode;
+          } else {
+            if (typeof newCode === 'string') {
+              item.responseCode = newCode;
+            }
+          }
         }
         return item;
       });

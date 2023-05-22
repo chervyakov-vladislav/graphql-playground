@@ -19,8 +19,9 @@ export const EditorHeader = () => {
   const handleClick = () => {
     const tabInfo = tabs.find((item) => item.id == activeTabId);
     if (tabInfo) {
+      console.log(tabInfo);
       const requestCode = joinTextFromArr(tabInfo.requestCode);
-
+      console.log(requestCode);
       dispatch(setQuery({ query: requestCode, variables: '' }));
     }
   };

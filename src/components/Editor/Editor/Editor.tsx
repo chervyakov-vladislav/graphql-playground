@@ -3,18 +3,13 @@ import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { ISelectionData } from '@/types/editorTypes';
 import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 
-interface IProps {
-  isRequest: boolean;
-}
-
-export function Editor(props: IProps) {
+export function Editor() {
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
   const [activeTabInfo, setActiveTabInfo] = useState<ITab[]>();
   const dispatch = useAppDispatch();
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
 
   useEffect(() => {
-    console.log(activeTabId);
     const tabInfo = tabs.filter((item) => item.id == activeTabId);
     if (tabInfo.length) {
       setActiveTabInfo(tabInfo);
@@ -22,7 +17,7 @@ export function Editor(props: IProps) {
   }, [activeTabId]);
 
   useEffect(() => {
-    dispatch(updateActiveTab(code));
+    dispatch(updateActiveTab({ code, isRequest: true }));
   }, [code]);
   const [activeLine, setActiveLine] = useState(0);
   const [activeLineSymbol, setActiveLineSymbol] = useState(0);
@@ -30,12 +25,7 @@ export function Editor(props: IProps) {
   const [selectionOptions, setSelectionOptions] = useState<ISelectionData | undefined>(undefined);
 
   useEffect(() => {
-    let code;
-    if (props.isRequest) {
-      code = activeTabInfo?.at(0)?.requestCode ?? [['']];
-    } else {
-      code = activeTabInfo?.at(0)?.responseCode ?? [['']];
-    }
+    const code = activeTabInfo?.at(0)?.requestCode ?? [['']];
     setCode(JSON.parse(JSON.stringify(code)));
     setActiveLine(0);
     setActiveLineSymbol(0);
@@ -513,7 +503,8 @@ export function Editor(props: IProps) {
     }
   };
 
-  const mouseUpHandler = () => {
+  const mouseUpHandler = (e: React.MouseEvent) => {
+    e.preventDefault();
     const selection = window.getSelection();
     if (selection) {
       const lineStart = Number(selection.anchorNode?.parentElement?.getAttribute('data-line'));
@@ -629,7 +620,7 @@ export function Editor(props: IProps) {
     }
   };
   return (
-    <div className="flex h-full h-[65vh] overflow-auto">
+    <div className="flex h-[65vh] overflow-auto">
       <div className="text-black pr-3">
         {code.map((item, index) => (
           <div

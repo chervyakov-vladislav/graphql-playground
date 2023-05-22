@@ -12,12 +12,7 @@ interface IProps {
 }
 
 export function CreateTabForm(props: IProps) {
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    reset,
-  } = useForm<tabNameForm>({
+  const { register, handleSubmit } = useForm<tabNameForm>({
     mode: 'onSubmit',
     defaultValues: {
       tabName: '',

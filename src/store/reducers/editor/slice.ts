@@ -6,16 +6,16 @@ interface PayloadParams {
   variables?: string;
 }
 
-const MOCK_QUERY = /* GraphQL */ `
-  {
-    users(limit: 6) {
-      name
-    }
-  }
-`;
+// const MOCK_QUERY = /* GraphQL */ `
+//   {
+//     users(limit: 6) {
+//       name
+//     }
+//   }
+// `;
 
 const initialState: PayloadParams = {
-  query: MOCK_QUERY,
+  query: '',
   variables: '',
 };
 
@@ -24,6 +24,7 @@ export const editorSlice = createSlice({
   initialState,
   reducers: {
     setQuery: (state, { payload }: PayloadAction<PayloadParams>) => {
+      console.log(payload);
       state.query = payload.query;
       state.variables = payload.variables;
     },
