@@ -8,6 +8,7 @@ import { ClipboardSuccess } from '@/components/ui/ClipboardSVG/ClipboardSuccess'
 import { ResponseButton } from '@/components/ui/ResponseButton/ResponseButton';
 import { DownloadResponseSVG } from '@/components/ui/DownloadResponseSVG/DownloadResponseSVG';
 import { isErrorWithMessage, isFetchBaseQueryError } from '@/utils/helpers';
+import { ResponseButtons } from '@/components/Response/ResponseButtons/ResponseButtons';
 
 export const Response = () => {
   // берем из слайса сформированный query, variables, headers в редакторе
@@ -17,7 +18,6 @@ export const Response = () => {
   const dispatch = useAppDispatch();
   const { query, variables } = useAppSelector(selectEditor);
   const [response, setResponse] = useState<string | undefined>();
-  const [clipboardClicked, setClipboardClicked] = useState(false);
   const [getResp, { data, isSuccess, isLoading, isError, error }] = useGetDataMutation();
 
   useLayoutEffect(() => {
@@ -60,39 +60,12 @@ export const Response = () => {
     );
   }, [data]);
 
-  const copyResponse = async () => {
-    if (typeof response === 'string') {
-      await navigator.clipboard.writeText(response);
-      setClipboardClicked(true);
-      setTimeout(() => {
-        setClipboardClicked(false);
-      }, 500);
-    }
-  };
-
-  const downloadResponseFile = () => {
-    if (response) {
-      const blob = new Blob([response], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = 'response.json';
-      link.href = url;
-      link.click();
-    }
-  };
   return (
     <div className="font-SourceCodePro text-color-documentation-primary">
       {isLoading && activeTabId === previousActiveTabId && <div>skeleton loading</div>}
       {isSuccess && response?.length && (
         <div className="relative">
-          <div className="absolute top-0 right-5">
-            <ResponseButton onClickFnc={copyResponse}>
-              {!clipboardClicked ? <ClipboardStatic /> : <ClipboardSuccess />}
-            </ResponseButton>
-            <ResponseButton onClickFnc={downloadResponseFile}>
-              <DownloadResponseSVG />
-            </ResponseButton>
-          </div>
+          <ResponseButtons response={response} />
           <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[65vh] overflow-auto text-sm">
             {response ? response : ''}
           </pre>
