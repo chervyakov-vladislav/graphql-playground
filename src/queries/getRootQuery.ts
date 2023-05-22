@@ -13,7 +13,7 @@ export const getRootListQuery = (operationType?: string) => {
   }
 };
 
-const getRootList = (param: string) => `${TYPE_REF + INPUT_VALUE}
+const getRootList = (param: string) => /* GraphQL */ `${TYPE_REF + INPUT_VALUE}
 {
   __schema {
     ${param}Type {

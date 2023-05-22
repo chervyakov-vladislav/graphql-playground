@@ -6,35 +6,48 @@ import Image from 'next/image';
 import Button from '@mui/material/Button';
 import passwordIcon from '@/assets/images/password-icon.svg';
 import mailIcon from '@/assets/images/mail-icon.svg';
-import Link from 'next/link';
 import { SubmitHandler, useForm, FormProvider } from 'react-hook-form';
 import { FormAuthType } from '@/types/types';
 import { authActions } from '@/store/reducers/auth/authSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { KindForm } from '@/types/enums';
+import { useTranslation } from 'next-i18next';
 
-const validationSchem = yup.object({
-  email: yup.string().email('Enter a valid email').required('Email is required'),
-  password: yup
-    .string()
-    .matches(/[0-9]/, 'Password must contain at least one number')
-    .matches(/[A-ZА-Я]/, 'Password must contain at least one uppercase letter')
-    .matches(
-      /^(?=.*[a-zа-я])(?=.*[A-ZА-Я])(?=.*\d)(?=.*[^\da-zA-Zа-яА-Я\s])(?!.*\s).{8,}$/,
-      'Password must contain at least one special symbol'
-    )
-    .min(8, 'Password should be of minimum 8 characters length')
-    .required('Password is required'),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password'), undefined], 'Password must much')
-    .required('Repeat password'),
-});
 type Props = {
   onSubmit: (data: FormAuthType) => void;
 };
 
 const FormSignin = ({ onSubmit }: Props) => {
+  const { t } = useTranslation();
+  const validationSchem = yup.object({
+    email: yup
+      .string()
+      .email(t('auth_page.validations.email_valid') as yup.Message<{ regex: RegExp }>)
+      .required(t('auth_page.validations.email_required') as yup.Message<{ regex: RegExp }>),
+    password: yup
+      .string()
+      .matches(
+        /[0-9]/,
+        t('auth_page.validations.password_one_number') as yup.Message<{ regex: RegExp }>
+      )
+      .matches(
+        /[A-ZА-Я]/,
+        t('auth_page.validations.password_one_uppercase') as yup.Message<{ regex: RegExp }>
+      )
+      .matches(
+        /^(?=.*[a-zа-я])(?=.*[A-ZА-Я])(?=.*\d)(?=.*[^\da-zA-Zа-яА-Я\s])(?!.*\s).{8,}$/,
+        t('auth_page.validations.password_one_special') as yup.Message<{ regex: RegExp }>
+      )
+      .min(8, t('auth_page.validations.password_8_length') as yup.Message<{ min: number }>)
+      .required(t('auth_page.validations.password_required') as yup.Message<{ regex: RegExp }>),
+    confirmPassword: yup
+      .string()
+      .oneOf(
+        [yup.ref('password'), undefined],
+        t('auth_page.validations.password_must_much') as unknown as undefined
+      )
+      .required(t('auth_page.validations.password_repeat') as yup.Message<{ regex: RegExp }>),
+  });
   const methods = useForm<FormAuthType>({
     mode: 'all',
     resolver: yupResolver(validationSchem),
@@ -59,32 +72,32 @@ const FormSignin = ({ onSubmit }: Props) => {
       <FormProvider {...methods}>
         <Stack spacing={2}>
           <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-xl">Sign in</h2>
+            <h2 className="font-semibold text-xl">{t('auth_page.title_sign_in')}</h2>
             <p className="text-xs">
-              Already have an account?{' '}
+              {t('auth_page.already_question')}{' '}
               <span
                 onClick={hadleChangeType}
                 className="cursor-pointer text-color-purple hover:underline decoration-1"
               >
-                Let&apos;s log in
+                {t('auth_page.already_link')}
               </span>
             </p>
           </div>
 
           <TextFieldStyled
             name="email"
-            label="Email Address"
+            label={t('auth_page.placeholders.email')}
             image={<Image alt="" src={mailIcon} className="w-[1.2rem]" />}
           />
           <TextFieldStyled
             name="password"
-            label="Password"
+            label={t('auth_page.placeholders.pass')}
             type="password"
             image={<Image alt="" src={passwordIcon} className="w-[1rem]" />}
           />
           <TextFieldStyled
             name="confirmPassword"
-            label="Repeat password"
+            label={t('auth_page.placeholders.repeat_pass')}
             type="password"
             image={<Image alt="" src={passwordIcon} className="w-[1rem]" />}
           />
@@ -94,7 +107,7 @@ const FormSignin = ({ onSubmit }: Props) => {
             variant="contained"
             className="bg-color-purple font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-color-border-dark-purple mb-[19px] hover:bg-color-hover-button-purple"
           >
-            Sign in
+            {t('auth_page.sign_in_btn')}
           </Button>
         </Stack>
       </FormProvider>

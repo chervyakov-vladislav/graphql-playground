@@ -24,7 +24,6 @@ export const editorSlice = createSlice({
   initialState,
   reducers: {
     setQuery: (state, { payload }: PayloadAction<PayloadParams>) => {
-      console.log(payload);
       state.query = payload.query;
       state.variables = payload.variables;
     },

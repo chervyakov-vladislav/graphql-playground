@@ -6,10 +6,13 @@ import { FormAuthType } from '@/types/types';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { authActions } from '@/store/reducers/auth/authSlice';
 import { auth } from 'firebase.config';
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 import { Alert, AlertTitle, Backdrop, CircularProgress } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 
 const FormAuth = () => {
+  const { t } = useTranslation();
+  const router = useRouter();
   const { kindOfForm, isLoading, error } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const handleSubmit = (data: FormAuthType) => {
@@ -19,7 +22,7 @@ const FormAuth = () => {
           dispatch(authActions.setIsLoading(true));
           dispatch(authActions.setUser({ id: user.uid, token: user.refreshToken }));
           dispatch(authActions.setIsLoading(false));
-          Router.push('/graphql');
+          router.push(`/graphql`, `/graphql`, { locale: router.locale });
         })
         .catch((error) => {
           dispatch(authActions.setError(error.message));
@@ -31,7 +34,7 @@ const FormAuth = () => {
         .then(({ user }) => {
           dispatch(authActions.setIsLoading(true));
           dispatch(authActions.setUser({ id: user.uid, token: user.refreshToken }));
-          Router.push('/graphql');
+          router.push(`/graphql`, `/graphql`, { locale: router.locale });
           dispatch(authActions.setIsLoading(false));
         })
         .catch((error) => {
@@ -50,7 +53,7 @@ const FormAuth = () => {
       )}
       {error && (
         <Alert severity="error" className="text-left">
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{t('auth_page.error')}</AlertTitle>
           {error}
         </Alert>
       )}

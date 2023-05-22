@@ -22,3 +22,19 @@ body {
   color: rgb(var(--foreground-rgb));
   background: #f4f6f8;
 }
+
+.query-highlight {
+  color: #832363;
+}
+
+.variable-highlight {
+  color: #1053a0;
+}
+
+.function-highlight {
+  color: #3f20ba;
+}
+
+.fields-highlight {
+  color: #1f6664;
+}

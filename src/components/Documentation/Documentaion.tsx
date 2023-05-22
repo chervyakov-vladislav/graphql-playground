@@ -9,26 +9,11 @@ import Root from './Root/Root';
 
 import { useAppSelector } from '@/store/hooks';
 import { selectDocument } from '@/store/reducers/document/slice';
+import { useTranslation } from 'react-i18next';
 
 const Documentaion = () => {
   const { isRoot } = useAppSelector(selectDocument);
-  const QUERY = {
-    query: `{
-    __schema {
-      queryType {
-        fields {
-          name
-        }
-      }
-    }
-  }`,
-  };
-
-  const [getData, { data }] = useGetDataMutation();
-
-  const handleClick = () => {
-    getData(QUERY);
-  };
+  const { t } = useTranslation();
 
   return (
     <>
@@ -41,7 +26,7 @@ const Documentaion = () => {
         fontSize={18}
         className="border-color-heading-border text-color-documentation-primary"
       >
-        Documentation
+        {t('graphql_page.docs')}
       </Typography>
       {isRoot ? (
         <Root />
@@ -51,10 +36,6 @@ const Documentaion = () => {
           <BackButton />
           <Arguments />
           <Fields />
-          <Button onClick={handleClick}>Загрузить</Button>
-          <pre className="break-all whitespace-pre-wrap">
-            {data ? JSON.stringify(data, null, '  ') : 'data template'}
-          </pre>
         </div>
       )}
     </>

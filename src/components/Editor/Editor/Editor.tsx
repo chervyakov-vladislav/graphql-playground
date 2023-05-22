@@ -3,7 +3,13 @@ import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { ISelectionData } from '@/types/editorTypes';
 import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 
-export function Editor() {
+import { syntaxHighlighting } from '@/utils/syntaxHighlighting';
+
+interface IProps {
+  isRequest: boolean;
+}
+
+export function Editor(props: IProps) {
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
   const [activeTabInfo, setActiveTabInfo] = useState<ITab[]>();
   const dispatch = useAppDispatch();
@@ -650,7 +656,12 @@ export function Editor() {
             onClick={clickNavigation}
           >
             {item.map((element, indexLetter) => (
-              <span key={indexLetter} data-letter={indexLetter} data-line={index}>
+              <span
+                className={syntaxHighlighting(item, index, element)}
+                key={indexLetter}
+                data-letter={indexLetter}
+                data-line={index}
+              >
                 {element}
               </span>
             ))}
