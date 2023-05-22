@@ -5,11 +5,7 @@ import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 
 import { syntaxHighlighting } from '@/utils/syntaxHighlighting';
 
-interface IProps {
-  isRequest: boolean;
-}
-
-export function Editor(props: IProps) {
+export function Editor() {
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
   const [activeTabInfo, setActiveTabInfo] = useState<ITab[]>();
   const dispatch = useAppDispatch();

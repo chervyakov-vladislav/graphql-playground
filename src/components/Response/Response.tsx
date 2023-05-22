@@ -2,7 +2,6 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectEditor } from '@/store/reducers/editor/slice';
 import { useGetDataMutation } from '@/store/api';
-import { prettifyResponse } from '@/utils/prettifyResponse';
 import { updateActiveTab } from '@/store/reducers/editorTabs/slice';
 
 export const Response = () => {
