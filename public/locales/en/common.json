@@ -57,5 +57,10 @@
       "repeat_pass": "Repeat password"
     },
     "error": "Error"
+  },
+  "graphql_page": {
+    "docs": "Documentation",
+    "request": "Operation",
+    "response": "Response"
   }
 }

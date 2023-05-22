@@ -57,5 +57,10 @@
       "repeat_pass": "Повторите пароль"
     },
     "error": "Ошибка"
+  },
+  "graphql_page": {
+    "docs": "Документация",
+    "request": "Запрос",
+    "response": "Ответ"
   }
 }

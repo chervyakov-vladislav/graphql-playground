@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from '@/assets/images/graphql-logo.svg';
 import Image from 'next/image';
 import HeaderMenu from '@/components/ui/HeaderMenu/HeaderMenu';
@@ -8,8 +8,27 @@ import { useRouter } from 'next/router';
 
 const Header = () => {
   const router = useRouter();
+
+  const [headerColor, setHeaderColor] = useState('color-dark-purple');
+  const handleSticky = () => {
+    if (window.scrollY >= 48) {
+      setHeaderColor(() => 'color-purple');
+    } else {
+      setHeaderColor(() => 'color-dark-purple');
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleSticky);
+    return () => {
+      window.removeEventListener('scroll', handleSticky);
+    };
+  }, []);
+
   return (
-    <header className="h-12 flex justify-between items-center bg-color-dark-purple pl-[2%] pr-[2%] z-10">
+    <header
+      className={`h-12 flex fixed right-0 left-0 duration-300 justify-between items-center bg-${headerColor} pl-[2%] pr-[2%] z-20`}
+    >
       <Link
         href={`/`}
         locale={router.locale}
