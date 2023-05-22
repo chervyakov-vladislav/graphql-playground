@@ -1,12 +1,13 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectEditor } from '@/store/reducers/editor/slice';
-import { useGetDataMutation } from '@/store/api';
+import { ICustomError, useGetDataMutation } from '@/store/api';
 import { updateActiveTab } from '@/store/reducers/editorTabs/slice';
 import { ClipboardStatic } from '@/components/ui/ClipboardSVG/ClipboardStatic';
 import { ClipboardSuccess } from '@/components/ui/ClipboardSVG/ClipboardSuccess';
 import { ResponseButton } from '@/components/ui/ResponseButton/ResponseButton';
 import { DownloadResponseSVG } from '@/components/ui/DownloadResponseSVG/DownloadResponseSVG';
+import { isErrorWithMessage, isFetchBaseQueryError } from '@/utils/helpers';
 
 export const Response = () => {
   // берем из слайса сформированный query, variables, headers в редакторе
@@ -17,7 +18,7 @@ export const Response = () => {
   const { query, variables } = useAppSelector(selectEditor);
   const [response, setResponse] = useState<string | undefined>();
   const [clipboardClicked, setClipboardClicked] = useState(false);
-  const [getResp, { data, isSuccess, isLoading, isError }] = useGetDataMutation();
+  const [getResp, { data, isSuccess, isLoading, isError, error }] = useGetDataMutation();
 
   useLayoutEffect(() => {
     if (query !== '') {
@@ -79,7 +80,6 @@ export const Response = () => {
       link.click();
     }
   };
-
   return (
     <div className="font-SourceCodePro text-color-documentation-primary">
       {isLoading && activeTabId === previousActiveTabId && <div>skeleton loading</div>}
@@ -98,7 +98,14 @@ export const Response = () => {
           </pre>
         </div>
       )}
-      {isError && activeTabId === previousActiveTabId && <>Error</>}
+      {isError && error && activeTabId === previousActiveTabId && (
+        <div className="text-color-text-bright-red">
+          <p>Error status: {isFetchBaseQueryError(error) && error.status}</p>
+          <p>
+            {isErrorWithMessage(error) && (error as unknown as ICustomError).data.errors[0].message}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
