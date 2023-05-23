@@ -57,8 +57,8 @@ export function Editor() {
   const clickNavigation = (e: React.MouseEvent) => {
     e.stopPropagation();
     const line = e.currentTarget.getAttribute('data-line');
-    // @ts-ignore
-    const word = e.target?.getAttribute('data-letter');
+    const target = e.target as HTMLElement;
+    const word = Number(target?.getAttribute('data-letter'));
     const position = window.getSelection()?.focusOffset;
     if (line) {
       setActiveLine(Number(line));
