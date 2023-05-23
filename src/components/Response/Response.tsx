@@ -2,20 +2,21 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectEditor } from '@/store/reducers/editor/slice';
 import { useGetDataMutation } from '@/store/api';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
 import { IResponse, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 import { isFetchBaseQueryError } from '@/utils/helpers';
 import { ResponseButtons } from '@/components/Response/ResponseButtons/ResponseButtons';
 
 export const Response = () => {
-  // берем из слайса сформированный query, variables, headers в редакторе
-  // либо уже готвый ответ, зависит от реализации
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
   const [previousActiveTabId, setPreviousActiveTabId] = useState<number | undefined>(activeTabId);
   const dispatch = useAppDispatch();
   const [requestTimeStart, setRequestTimeStart] = useState(0);
-  const { query, variables } = useAppSelector(selectEditor);
+  const {
+    body: { query, variables },
+  } = useAppSelector(selectEditor);
   const [response, setResponse] = useState<string | undefined>();
-  const [getResp, { data, isSuccess, isLoading, error }] = useGetDataMutation({
+  const [getResp, { data, isSuccess, isLoading, isError, error }] = useGetDataMutation({
     fixedCacheKey: 'LoadData',
   });
 
@@ -23,7 +24,7 @@ export const Response = () => {
     if (query !== '') {
       const timeNow = Date.now();
       setRequestTimeStart(timeNow);
-      getResp({ query, variables: variables ? variables : undefined });
+      getResp({ body: { query, variables: variables ? variables : undefined } });
     }
   }, [query]);
 
@@ -55,9 +56,9 @@ export const Response = () => {
     const time = Date.now() - requestTimeStart;
     const size = new TextEncoder().encode(stringData).length;
     let status = isSuccess ? 200 : 400;
-    console.log(stringData && time && size && status);
+
     if (isFetchBaseQueryError(error)) {
-      status = error.status;
+      status = error.status as number;
     }
     if (stringData && time && size && status) {
       if (previousActiveTabId === activeTabId && stringData) {
@@ -88,9 +89,16 @@ export const Response = () => {
       {response && response.length && (
         <div className="relative">
           <ResponseButtons response={response} />
-          <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[65vh] overflow-auto text-sm">
-            {response ? response : ''}
-          </pre>
+          {isSuccess && (
+            <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[60vh] overflow-auto">
+              {response ? response : ''}
+            </pre>
+          )}
+          {isError && (
+            <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[60vh] overflow-auto">
+              {JSON.stringify((error as FetchBaseQueryError).data, null, '  ')}
+            </pre>
+          )}
         </div>
       )}
     </div>

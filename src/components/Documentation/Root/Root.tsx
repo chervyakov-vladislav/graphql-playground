@@ -32,7 +32,9 @@ const Root = () => {
     setElemText(() => newValue);
 
     getData({
-      query: getRootListQuery(newValue),
+      body: {
+        query: getRootListQuery(newValue),
+      },
     }).unwrap();
   };
 

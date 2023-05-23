@@ -2,8 +2,11 @@ import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/tool
 import { HYDRATE } from 'next-redux-wrapper';
 
 interface PayloadParams {
-  query: string;
-  variables?: string;
+  body: {
+    query: string;
+    variables?: string;
+  };
+  headers?: Record<string, string>;
 }
 
 export interface ICustomError {
@@ -28,12 +31,15 @@ export const graphQl = createApi({
   },
   endpoints: (build) => ({
     getData: build.mutation({
-      query: (body: PayloadParams) => ({
-        url: '/',
-        method: 'POST',
-        headers: {
+      query: ({
+        body,
+        headers = {
           'Content-Type': 'application/json',
         },
+      }: PayloadParams) => ({
+        url: '/',
+        method: 'POST',
+        headers,
         body,
       }),
       invalidatesTags: [{ type: 'Data', id: 'LIST' }],

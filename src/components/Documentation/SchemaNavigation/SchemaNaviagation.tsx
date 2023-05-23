@@ -24,7 +24,9 @@ const SchemaNaviagation = () => {
   const handleNav = (index: number) => {
     if (!index) {
       getData({
-        query: ROOT_QUERY,
+        body: {
+          query: ROOT_QUERY,
+        },
       });
     } else {
       dispatch(sliceNavItems(index));

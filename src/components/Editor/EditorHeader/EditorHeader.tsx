@@ -22,8 +22,7 @@ export const EditorHeader = () => {
     const tabInfo = tabs.find((item) => item.id == activeTabId);
     if (tabInfo) {
       const requestCode = joinTextFromArr(tabInfo.requestCode);
-
-      dispatch(setQuery({ query: requestCode, variables: tabInfo.variablesCode }));
+      dispatch(setQuery({ body: { query: requestCode, variables: tabInfo.variablesCode } }));
     }
   };
   return (
