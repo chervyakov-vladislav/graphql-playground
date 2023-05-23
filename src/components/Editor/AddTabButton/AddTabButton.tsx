@@ -1,7 +1,5 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import React from 'react';
-import { useAppDispatch } from '@/hooks/redux';
-import { editorTabSlice } from '@/store/reducers/editorTabs/slice';
 
 interface IProps {
   modalOpenFnc: () => void;

@@ -1,5 +1,3 @@
-import { ClipboardStatic } from '@/components/ui/ClipboardSVG/ClipboardStatic';
-import { ClipboardSuccess } from '@/components/ui/ClipboardSVG/ClipboardSuccess';
 import React from 'react';
 
 interface IProps {

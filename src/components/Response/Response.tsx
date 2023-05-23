@@ -3,10 +3,6 @@ import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectEditor } from '@/store/reducers/editor/slice';
 import { ICustomError, useGetDataMutation } from '@/store/api';
 import { updateActiveTab } from '@/store/reducers/editorTabs/slice';
-import { ClipboardStatic } from '@/components/ui/ClipboardSVG/ClipboardStatic';
-import { ClipboardSuccess } from '@/components/ui/ClipboardSVG/ClipboardSuccess';
-import { ResponseButton } from '@/components/ui/ResponseButton/ResponseButton';
-import { DownloadResponseSVG } from '@/components/ui/DownloadResponseSVG/DownloadResponseSVG';
 import { isErrorWithMessage, isFetchBaseQueryError } from '@/utils/helpers';
 import { ResponseButtons } from '@/components/Response/ResponseButtons/ResponseButtons';
 
