@@ -2,9 +2,8 @@ import { TabsContainer } from '@/components/Editor/TabsContainer/TabsContainer';
 import { Grid } from '@mui/material';
 import { EditorHeader } from '@/components/Editor/EditorHeader/EditorHeader';
 import { Editor } from '@/components/Editor/Editor/Editor';
-import { Response } from '@/components/Response/Response';
 import EditorVars from '../EditorVars/EditorVars';
-import { ResponseHeader } from '@/components/ResponseHeader/ResponseHeader';
+import { ResponseBlock } from '@/components/ResponseBlock/ResponseBlock';
 
 export function EditorContainer() {
   return (
@@ -28,12 +27,7 @@ export function EditorContainer() {
           </div>
         </Grid>
         <Grid item md={6} xs={12}>
-          <div className="flex mt-[8px]">
-            <div className="p-8 grow text-black font-SourceSansPro">
-              <ResponseHeader />
-              <Response />
-            </div>
-          </div>
+          <ResponseBlock />
         </Grid>
       </Grid>
     </div>

@@ -18,3 +18,16 @@ export function isErrorWithMessage(error: unknown): error is { message: string }
     typeof error.data.errors[0].message === 'string'
   );
 }
+
+export function millisecondsInSec(time: number) {
+  const newNumber = Number((time / 1000).toFixed(2));
+  return Math.floor(newNumber) > 0 ? newNumber + 's' : time + 'ms';
+}
+
+export function convertBytes(bytes: number) {
+  if (bytes < 1024) {
+    return bytes + 'B';
+  } else {
+    return (bytes / 1024).toFixed(1) + 'KB';
+  }
+}
