@@ -63,6 +63,17 @@
   "graphql_page": {
     "docs": "Documentation",
     "request": "Operation",
-    "response": "Response"
+    "response": "Response",
+    "editor": {
+      "operation": "Operation",
+      "response": "Response",
+      "status": "STATUS"
+    },
+    "add_tab": {
+      "enter_tab": "Enter tab name",
+      "add_tab": "Add tab",
+      "tab_name": "Tab name"
+    },
+    "variables_header": "Variables"
   }
 }

@@ -63,6 +63,17 @@
   "graphql_page": {
     "docs": "Документация",
     "request": "Запрос",
-    "response": "Ответ"
+    "response": "Ответ",
+    "editor": {
+      "operation": "Запрос",
+      "response": "Ответ",
+      "status": "СТАТУС"
+    },
+    "add_tab": {
+      "enter_tab": "Введите имя вкладки",
+      "add_tab": "Добавить новую вкладку",
+      "tab_name": "Имя вкладки"
+    },
+    "variables_header": "Переменные"
   }
 }
