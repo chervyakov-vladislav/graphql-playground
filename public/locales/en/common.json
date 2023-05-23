@@ -27,6 +27,8 @@
     "form": {
       "welcome": "Welcome!",
       "desc": "To start using the service, please log in with your account",
+      "desc_authed": "To start using the service, please go to the editor",
+      "editor_btn": "Go to editor",
       "login": "Log in",
       "signin": "Sign in"
     }
@@ -61,6 +63,17 @@
   "graphql_page": {
     "docs": "Documentation",
     "request": "Operation",
-    "response": "Response"
+    "response": "Response",
+    "editor": {
+      "operation": "Operation",
+      "response": "Response",
+      "status": "STATUS"
+    },
+    "add_tab": {
+      "enter_tab": "Enter tab name",
+      "add_tab": "Add tab",
+      "tab_name": "Tab name"
+    },
+    "variables_header": "Variables"
   }
 }

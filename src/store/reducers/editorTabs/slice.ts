@@ -8,11 +8,18 @@ interface PayloadParams {
   activeTabId: number;
 }
 
+export interface IResponse {
+  response: string;
+  status: number;
+  size: number;
+  time: number;
+}
+
 export interface ITab {
   id: number;
   name: string;
   requestCode: Array<Array<string>>;
-  responseCode: string | null;
+  responseCode: IResponse | null;
   variablesCode: string;
   headersCode: string | null;
 }
@@ -90,24 +97,24 @@ export const editorTabSlice = createSlice({
     updateActiveTab: (
       state,
       action: PayloadAction<{
-        code: Array<Array<string>> | string;
+        code: Array<Array<string>> | IResponse;
         isRequest: boolean;
         activeId?: number;
       }>
     ) => {
       const activeTab = action.payload.activeId ?? state.activeTabId;
-      let newCode: Array<Array<string>> | string;
+      let newCode: Array<Array<string>> | IResponse;
       if (action.payload.isRequest) {
         newCode = action.payload.code ?? [['']];
       } else {
-        newCode = action.payload.code ?? '';
+        newCode = action.payload.code ?? { time: 0, size: 0, status: 0, response: '' };
       }
       state.tabs = state.tabs.map((item) => {
         if (item.id == activeTab) {
           if (action.payload.isRequest && Array.isArray(newCode)) {
             item.requestCode = newCode;
           } else {
-            if (typeof newCode === 'string') {
+            if ('status' in newCode) {
               item.responseCode = newCode;
             }
           }
@@ -116,11 +123,8 @@ export const editorTabSlice = createSlice({
       });
     },
     setVars: (state, action) => {
-      console.log(state);
       const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId);
-      console.log(activeTab);
       if (activeTab) activeTab.variablesCode = action.payload;
-      console.log(state);
     },
   },
 });

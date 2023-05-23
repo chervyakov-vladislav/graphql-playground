@@ -1,9 +1,16 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { HYDRATE } from 'next-redux-wrapper';
 
 interface PayloadParams {
   query: string;
   variables?: string;
+}
+
+export interface ICustomError {
+  data: {
+    errors: Array<{ message: string }>;
+  };
+  status: number;
 }
 
 const baseUrl = 'https://api.escuelajs.co/graphql';
@@ -13,7 +20,7 @@ export const graphQl = createApi({
   tagTypes: ['Data'],
   baseQuery: fetchBaseQuery({
     baseUrl,
-  }),
+  }) as BaseQueryFn<string | FetchArgs, unknown, ICustomError, object>,
   extractRehydrationInfo(action, { reducerPath }) {
     if (action.type === HYDRATE) {
       return action.payload[reducerPath];
