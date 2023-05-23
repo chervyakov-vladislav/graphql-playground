@@ -39,32 +39,61 @@ export const MainAuthBlock = () => {
           {t('welcome_page.form.welcome')}
         </h2>
       </div>
-      <div className={'mb-14'}>
-        <p className={'font-SourceSansPro max-w-[181px] text-sm leading-5 text-black my-0 mx-auto'}>
-          {t('welcome_page.form.desc')}
-        </p>
-      </div>
-      <Button
-        variant="contained"
-        name="loginin"
-        onClick={handleClick}
-        className={
-          'bg-color-purple font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-color-border-dark-purple mb-[19px] hover:bg-color-hover-button-purple'
-        }
-      >
-        {t('welcome_page.form.login')}
-      </Button>
+      {id && (
+        <>
+          <div className={'mb-14'}>
+            <p
+              className={
+                'font-SourceSansPro max-w-[181px] text-sm leading-5 text-black my-0 mx-auto'
+              }
+            >
+              {t('welcome_page.form.desc_authed')}
+            </p>
+          </div>
+          <Button
+            variant="contained"
+            name="loginin"
+            onClick={handleClick}
+            className={
+              'bg-color-purple font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-color-border-dark-purple mb-[19px] hover:bg-color-hover-button-purple'
+            }
+          >
+            {t('welcome_page.form.editor_btn')}
+          </Button>
+        </>
+      )}
       {!id && (
-        <Button
-          variant="contained"
-          name="signin"
-          onClick={handleClick}
-          className={
-            'bg-transparent text-color-bright-black font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-transparent shadow-none hover:border-color-bright-black hover:bg-transparent'
-          }
-        >
-          {t('welcome_page.form.signin')}
-        </Button>
+        <>
+          <div className={'mb-14'}>
+            <p
+              className={
+                'font-SourceSansPro max-w-[181px] text-sm leading-5 text-black my-0 mx-auto'
+              }
+            >
+              {t('welcome_page.form.desc')}
+            </p>
+          </div>
+          <Button
+            variant="contained"
+            name="loginin"
+            onClick={handleClick}
+            className={
+              'bg-color-purple font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-color-border-dark-purple mb-[19px] hover:bg-color-hover-button-purple'
+            }
+          >
+            {t('welcome_page.form.login')}
+          </Button>
+          <Button
+            variant="contained"
+            name="signin"
+            onClick={handleClick}
+            className={
+              'bg-transparent text-color-bright-black font-semibold normal-case text-[14px] w-full rounded-b h-[42px] border border-transparent shadow-none hover:border-color-bright-black hover:bg-transparent'
+            }
+          >
+            {t('welcome_page.form.signin')}
+          </Button>
+        </>
       )}
     </div>
   );

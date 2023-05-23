@@ -27,6 +27,8 @@
     "form": {
       "welcome": "Welcome!",
       "desc": "To start using the service, please log in with your account",
+      "desc_authed": "To start using the service, please go to the editor",
+      "editor_btn": "Go to editor",
       "login": "Log in",
       "signin": "Sign in"
     }
