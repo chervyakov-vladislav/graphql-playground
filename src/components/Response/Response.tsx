@@ -14,6 +14,7 @@ export const Response = () => {
   const [requestTimeStart, setRequestTimeStart] = useState(0);
   const {
     body: { query, variables },
+    headers,
   } = useAppSelector(selectEditor);
   const [response, setResponse] = useState<string | undefined>();
   const [getResp, { data, isSuccess, isLoading, isError, error }] = useGetDataMutation({
@@ -24,9 +25,9 @@ export const Response = () => {
     if (query !== '') {
       const timeNow = Date.now();
       setRequestTimeStart(timeNow);
-      getResp({ body: { query, variables: variables ? variables : undefined } });
+      getResp({ body: { query, variables: variables ? variables : undefined }, headers: headers });
     }
-  }, [query]);
+  }, [query, variables, headers]);
 
   useEffect(() => {
     const tabInfo = tabs.filter((item) => item.id == activeTabId);

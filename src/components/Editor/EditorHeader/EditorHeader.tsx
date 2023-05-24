@@ -22,7 +22,13 @@ export const EditorHeader = () => {
     const tabInfo = tabs.find((item) => item.id == activeTabId);
     if (tabInfo) {
       const requestCode = joinTextFromArr(tabInfo.requestCode);
-      dispatch(setQuery({ body: { query: requestCode, variables: tabInfo.variablesCode } }));
+      const requestHeaders = tabInfo.headersCode ? JSON.parse(tabInfo.headersCode) : {};
+      dispatch(
+        setQuery({
+          body: { query: requestCode, variables: tabInfo.variablesCode },
+          headers: requestHeaders,
+        })
+      );
     }
   };
   return (

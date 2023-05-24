@@ -21,7 +21,7 @@ export interface ITab {
   requestCode: Array<Array<string>>;
   responseCode: IResponse | null;
   variablesCode: string;
-  headersCode: string | null;
+  headersCode: string;
 }
 
 const initialState: PayloadParams = {
@@ -42,7 +42,7 @@ const initialState: PayloadParams = {
       ],
       responseCode: null,
       variablesCode: '',
-      headersCode: null,
+      headersCode: '',
     },
   ],
   ids: [1],
@@ -70,7 +70,7 @@ export const editorTabSlice = createSlice({
         requestCode: [['']],
         responseCode: null,
         variablesCode: '',
-        headersCode: null,
+        headersCode: '',
       });
       state.activeTabId = newId;
     },
@@ -126,11 +126,15 @@ export const editorTabSlice = createSlice({
       const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId);
       if (activeTab) activeTab.variablesCode = action.payload;
     },
+    setHeads: (state, action) => {
+      const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId);
+      if (activeTab) activeTab.headersCode = action.payload;
+    },
   },
 });
 
 export const selectEditor = (state: RootState) => state.editorTab;
 
-export const { addTab, updateActiveTab, setVars } = editorTabSlice.actions;
+export const { addTab, updateActiveTab, setVars, setHeads } = editorTabSlice.actions;
 
 export default editorTabSlice.reducer;

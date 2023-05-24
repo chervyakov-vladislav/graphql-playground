@@ -26,6 +26,10 @@ export const editorSlice = createSlice({
     setQuery: (state, { payload }: PayloadAction<PayloadParams>) => {
       state.body.query = payload.body.query;
       state.body.variables = payload.body.variables;
+      state.headers = {
+        'Content-Type': 'application/json',
+        ...payload.headers,
+      };
     },
 
     setQueryBody: (state, { payload }: PayloadAction<PayloadParams>) => {

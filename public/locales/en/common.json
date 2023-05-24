@@ -74,6 +74,7 @@
       "add_tab": "Add tab",
       "tab_name": "Tab name"
     },
-    "variables_header": "Variables"
+    "variables": "Variables",
+    "headers": "Headers"
   }
 }
