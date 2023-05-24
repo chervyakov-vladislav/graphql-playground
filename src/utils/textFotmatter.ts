@@ -6,5 +6,5 @@ export const capitalize = (item: string) =>
 
 export const joinTextFromArr = (textArr: Array<Array<string>>) => {
   const joinedStr = textArr.map((st) => st.join(''));
-  return joinedStr.join('');
+  return joinedStr.join('\n');
 };

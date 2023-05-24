@@ -10,7 +10,7 @@ const Columns = () => {
       direction="row"
       justifyContent="center"
       alignItems="flex-start"
-      className="pl-[2%]"
+      className="pl-[2%] pt-7"
     >
       <Grid item xl={3} xs={12} className="flex flex-col pt-12">
         <Documentaion />

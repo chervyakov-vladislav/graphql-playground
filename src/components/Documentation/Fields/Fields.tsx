@@ -58,7 +58,9 @@ const Fields = () => {
         prevArgs: args,
       };
       getData({
-        query: getTypeFields(currentType),
+        body: {
+          query: getTypeFields(currentType),
+        },
       });
       dispatch(addNavItem(navObj));
     }

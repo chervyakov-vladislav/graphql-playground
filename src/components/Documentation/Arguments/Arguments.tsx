@@ -34,7 +34,9 @@ const Arguments = () => {
       return;
     } else {
       getData({
-        query: getTypeFields(currentType),
+        body: {
+          query: getTypeFields(currentType),
+        },
       });
     }
   };

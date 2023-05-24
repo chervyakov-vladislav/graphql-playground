@@ -39,7 +39,9 @@ const BackButton = () => {
     dispatch(setFields(newData.prevFields));
     if (nav[nav.length - 2].name === 'root') {
       getData({
-        query: ROOT_QUERY,
+        body: {
+          query: ROOT_QUERY,
+        },
       });
     }
   };
