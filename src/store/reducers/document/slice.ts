@@ -1,96 +1,75 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '@/store/store';
-import { HYDRATE } from 'next-redux-wrapper';
-import { Data, Fields, Args, NavObj } from '@/types/schema-types';
+import { IntrospectionQuery } from '@/types/intorspectionTypes';
 
 interface InitialState {
-  nav: NavObj[];
-  schema: Data | null;
+  link: string;
+  firstLoad: boolean;
   isRoot: boolean;
-  fields: Fields[];
-  args: Args[];
+  schema: IntrospectionQuery | null;
+  currentType: string;
+  navigationStack: string[];
 }
 
 const initialState: InitialState = {
-  nav: [
-    {
-      name: 'root',
-      prevSchema: null,
-      prevFields: [],
-      prevArgs: [],
-    },
-  ],
-  isRoot: true,
+  link: 'https://api.escuelajs.co/graphql',
   schema: null,
-  fields: [],
-  args: [],
+  firstLoad: true,
+  isRoot: true,
+  currentType: '',
+  navigationStack: ['Root'],
 };
 
 export const documentSlice = createSlice({
   name: 'document',
   initialState,
   reducers: {
-    addNavItem: (state, action: PayloadAction<NavObj>) => {
-      state.nav.push(action.payload);
+    setNewLink: (state, action: PayloadAction<string>) => {
+      state.link = action.payload;
     },
-    sliceNavItems: (state, action: PayloadAction<number>) => {
-      state.nav = state.nav.slice(0, action.payload + 1);
+    setFirstLoad: (state) => {
+      state.firstLoad = false;
     },
-    deleteNavItem: (state) => {
-      state.nav.pop();
+    setSchema: (state, action: PayloadAction<{ data: IntrospectionQuery }>) => {
+      (state.schema as IntrospectionQuery) = action.payload.data as IntrospectionQuery;
+      state.isRoot = true;
+      state.currentType = '';
     },
-    addSchema: (state, action: PayloadAction<Data>) => {
-      state.schema = action.payload;
+    setCurrentType: (state, action: PayloadAction<string>) => {
+      state.currentType = action.payload;
+      state.navigationStack.push(action.payload);
     },
     setRoot: (state, action: PayloadAction<boolean>) => {
       state.isRoot = action.payload;
     },
-    resetRoot: (state) => {
-      state.nav = [
-        {
-          name: 'root',
-          prevSchema: null,
-          prevFields: [],
-          prevArgs: [],
-        },
-      ];
-    },
-    setFields: (state, action: PayloadAction<Fields[]>) => {
-      state.fields = action.payload;
-    },
-    setArgs: (state, action: PayloadAction<Args[]>) => {
-      state.args = action.payload;
-    },
-  },
-  extraReducers: (builder) => {
-    builder.addCase<typeof HYDRATE, PayloadAction<RootState, typeof HYDRATE>>(
-      HYDRATE,
-      (state, action) => {
-        if (action.payload.document.nav) {
-          state.nav = action.payload.document.nav;
-        }
-
-        if (action.payload.document.schema) {
-          state.schema = action.payload.document.schema;
-        }
-
-        return state;
+    backNavigation: (state) => {
+      state.navigationStack.pop();
+      if (state.navigationStack.length === 1) {
+        state.isRoot = true;
+        state.currentType = '';
+        state.navigationStack = ['Root'];
+      } else {
+        state.currentType = state.navigationStack[state.navigationStack.length - 1];
       }
-    );
+    },
+    resetNav: (state) => {
+      state.isRoot = true;
+      state.currentType = '';
+      state.navigationStack = ['Root'];
+    },
   },
 });
 
 export const selectDocument = (state: RootState) => state.document;
 
 export const {
-  addNavItem,
-  addSchema,
+  setNewLink,
+  setFirstLoad,
+  setSchema,
+  setCurrentType,
   setRoot,
-  setFields,
-  setArgs,
-  resetRoot,
-  deleteNavItem,
-  sliceNavItems,
+  backNavigation,
+  resetNav,
 } = documentSlice.actions;
 
 export default documentSlice.reducer;

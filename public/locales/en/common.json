@@ -61,7 +61,10 @@
     "error": "Error"
   },
   "graphql_page": {
-    "docs": "Documentation",
+    "docs": {
+      "title": "Documentation",
+      "error": "Wrong link"
+    },
     "request": "Operation",
     "response": "Response",
     "editor": {

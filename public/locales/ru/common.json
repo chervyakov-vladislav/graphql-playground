@@ -61,7 +61,10 @@
     "error": "Ошибка"
   },
   "graphql_page": {
-    "docs": "Документация",
+    "docs": {
+      "title": "Документация",
+      "error": "Неверная ссылка"
+    },
     "request": "Запрос",
     "response": "Ответ",
     "editor": {
