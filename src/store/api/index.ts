@@ -1,5 +1,34 @@
-import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { HYDRATE } from 'next-redux-wrapper';
+
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import type { RootState } from '../store';
+import { selectDocument } from '../reducers/document/slice';
+
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: '',
+});
+
+const dynamicBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const { link } = selectDocument(api.getState() as RootState);
+  if (!link) {
+    return {
+      error: {
+        status: 400,
+        statusText: 'Bad Request',
+        data: 'Not valid url',
+      },
+    };
+  }
+
+  const adjustedUrl = link;
+  const adjustedArgs = typeof args === 'string' ? adjustedUrl : { ...args, url: adjustedUrl };
+  return rawBaseQuery(adjustedArgs, api, extraOptions);
+};
 
 interface PayloadParams {
   body: {
@@ -16,14 +45,10 @@ export interface ICustomError {
   status: number;
 }
 
-const baseUrl = 'https://api.escuelajs.co/graphql';
-
 export const graphQl = createApi({
   reducerPath: 'getData',
   tagTypes: ['Data'],
-  baseQuery: fetchBaseQuery({
-    baseUrl,
-  }) as BaseQueryFn<string | FetchArgs, unknown, ICustomError, object>,
+  baseQuery: dynamicBaseQuery,
   extractRehydrationInfo(action, { reducerPath }) {
     if (action.type === HYDRATE) {
       return action.payload[reducerPath];

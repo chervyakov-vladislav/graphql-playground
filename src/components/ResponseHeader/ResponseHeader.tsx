@@ -21,10 +21,8 @@ export function ResponseHeader() {
 
   const getData = () => {
     const tabInfo = tabs.filter((item) => item.id == activeTabId);
-    console.log(tabInfo);
     if (tabInfo && tabInfo.length && tabInfo[0] && tabInfo[0].responseCode) {
       const responseData = tabInfo[0].responseCode;
-      console.log(responseData);
       const obj = {
         time: responseData.time,
         size: responseData.size,
