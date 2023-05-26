@@ -17,7 +17,7 @@ export const Response = () => {
     headers,
   } = useAppSelector(selectEditor);
   const [response, setResponse] = useState<string | undefined>();
-  const [getResp, { data, isSuccess, isLoading, isError, error }] = useGetDataMutation({
+  const [getResp, { data, isSuccess, isLoading, error }] = useGetDataMutation({
     fixedCacheKey: 'LoadData',
   });
 
@@ -90,16 +90,9 @@ export const Response = () => {
       {response && response.length && (
         <div className="relative">
           <ResponseButtons response={response} />
-          {isSuccess && (
-            <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[60vh] overflow-auto">
-              {response ? response : ''}
-            </pre>
-          )}
-          {isError && (
-            <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[60vh] overflow-auto">
-              {JSON.stringify((error as FetchBaseQueryError).data, null, '  ')}
-            </pre>
-          )}
+          <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[60vh] overflow-auto text-sm">
+            {response ? response : ''}
+          </pre>
         </div>
       )}
     </div>

@@ -1,21 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { ISelectionData } from '@/types/editorTypes';
+import { ISelectionData, IUndoData } from '@/types/editorTypes';
 import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 
 import { syntaxHighlighting } from '@/utils/syntaxHighlighting';
+import {
+  addNewLetterFnc,
+  addNewLineFnc,
+  backspaceLineWithContent,
+  backspaceSymbolInMiddle,
+  deleteSymbolFnc,
+  getWords,
+} from '@/utils/editorHelpers';
 
 export function Editor() {
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
   const [activeTabInfo, setActiveTabInfo] = useState<ITab[]>();
   const dispatch = useAppDispatch();
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
+  const [undo, setUndo] = useState<Array<IUndoData>>();
+  const [undoOffset, setUndoOffset] = useState(0);
 
   useEffect(() => {
     const tabInfo = tabs.filter((item) => item.id == activeTabId);
     if (tabInfo.length) {
       setActiveTabInfo(tabInfo);
     }
+    setUndo(undefined);
   }, [activeTabId]);
 
   useEffect(() => {
@@ -52,6 +63,48 @@ export function Editor() {
 
   const blurEvent = () => {
     setIsFocus(false);
+  };
+
+  const addNewUndo = (
+    editedCode: Array<Array<string>>,
+    cursorLine: number,
+    cursorSymbol: number
+  ) => {
+    const obj = { code: editedCode, cursorLine, cursorSymbol };
+    if (undo?.length) {
+      let undoArr: IUndoData[] | undefined;
+      if (undoOffset) {
+        undoArr = undo.slice(0, undo.length - undoOffset);
+        setUndoOffset(0);
+      }
+      const result = undoArr ?? undo;
+      if (result.length === 10) {
+        setUndo([...result.slice(1), obj]);
+      } else {
+        setUndo([...result, obj]);
+      }
+    } else {
+      setUndo([{ code, cursorSymbol: activeLineSymbol, cursorLine: activeLine }, obj]);
+    }
+  };
+
+  const undoRedoFnc = (isUndo: boolean) => {
+    if (undo && undo.length) {
+      let obj;
+      if (isUndo) {
+        obj = undo[undo.length - 1 - undoOffset - 1];
+      } else {
+        obj = undo[undo.length - 1 - undoOffset + 1];
+      }
+      if (obj) {
+        setCode(obj.code);
+        setActiveLine(obj.cursorLine);
+        setActiveLineSymbol(obj.cursorSymbol);
+        isUndo
+          ? setUndoOffset((prevState) => prevState + 1)
+          : setUndoOffset((prevState) => prevState - 1);
+      }
+    }
   };
 
   const clickNavigation = (e: React.MouseEvent) => {
@@ -95,13 +148,10 @@ export function Editor() {
     setCode(newCodeArray);
   };
 
-  const getActiveLineLength = (line?: number) => {
+  const getActiveLineLength = (line?: number, array?: Array<Array<string>>) => {
     const lineToCalc = line ?? activeLine;
-    return code[lineToCalc].reduce((acc, item) => acc + item.length, 0);
-  };
-  const getActiveLineLengthArr = (line: number, array: Array<Array<string>>) => {
-    const lineToCalc = line ?? activeLine;
-    return array[lineToCalc].reduce((acc, item) => acc + item.length, 0);
+    const codeArray = array ?? code;
+    return codeArray[lineToCalc].reduce((acc, item) => acc + item.length, 0);
   };
 
   const getCurrentWord = (codeActiveLine?: Array<string>, lineCursor?: number) => {
@@ -128,75 +178,17 @@ export function Editor() {
     const arrayWithCode = array ?? code;
     const codeActiveLine = newActiveLine ?? activeLine;
     const lineCursorPosition = cursorPosition ?? activeLineSymbol;
-    let newCodeArray;
     const { word, position } = getCurrentWord(arrayWithCode[codeActiveLine], lineCursorPosition);
-    if (!letter.match(/\w|[А-я|$|_]/gm) || letter === 'Tab') {
-      newCodeArray = arrayWithCode.map((item, index) => {
-        if (index === codeActiveLine) {
-          const rightSide = item[word - 1].slice(position);
-          let itemArray;
-          const newLetter = letter === '{' ? ['{', '}'] : letter === 'Tab' ? [' ', ' '] : [letter];
-          if (item.slice(word).length) {
-            if (rightSide) {
-              itemArray = [
-                ...item.slice(0, word - 1),
-                item[word - 1].slice(0, position),
-                ...newLetter,
-                item[word - 1].slice(position),
-                ...item.slice(word),
-              ];
-            } else {
-              itemArray = [
-                ...item.slice(0, word - 1),
-                item[word - 1].slice(0, position),
-                ...newLetter,
-                ...item.slice(word),
-              ];
-            }
-          } else {
-            itemArray = [
-              ...item.slice(0, word - 1),
-              item[word - 1].slice(0, position),
-              ...newLetter,
-              item[word - 1].slice(position),
-              ...item.slice(word),
-            ];
-          }
-          const filterArray = itemArray.filter((str) => str !== '');
-          return filterArray.length ? filterArray : [''];
-        }
-        return item.filter((str) => str !== '');
-      });
-    } else {
-      newCodeArray = arrayWithCode.map((item, index) => {
-        if (index === codeActiveLine) {
-          let addToCount = 0;
-          if (!item[word - 1].match(/\w|[А-я|$|_]/gm)) {
-            item = [...item.slice(0, word), '', ...item.slice(word)];
-            addToCount += 1;
-          }
-          const newLineArray = item[word + addToCount - 1].split('');
-          newLineArray.splice(position, 0, letter);
-          const newLine = newLineArray.join('');
-          return [
-            ...item.slice(0, word - 1 + addToCount),
-            newLine,
-            ...item.slice(word + addToCount),
-          ];
-        }
-        if (item.length === 1 && item[0] === '') {
-          return item;
-        } else {
-          return item.filter((str) => str !== '');
-        }
-      });
-    }
+    const newCodeArray = addNewLetterFnc(arrayWithCode, codeActiveLine, word, position, letter);
+    let newSymbolPosition;
     if (letter === 'Tab') {
-      setActiveLineSymbol(lineCursorPosition + 2);
+      newSymbolPosition = lineCursorPosition + 2;
     } else {
-      setActiveLineSymbol(lineCursorPosition + 1);
+      newSymbolPosition = lineCursorPosition + 1;
     }
+    setActiveLineSymbol(newSymbolPosition);
     updateCode(newCodeArray);
+    addNewUndo(newCodeArray, codeActiveLine, newSymbolPosition);
   };
 
   const addNewLine = (
@@ -204,44 +196,23 @@ export function Editor() {
     newActiveLine?: number,
     cursorPosition?: number
   ) => {
-    let newArray;
     const arrayWithCode = array ?? code;
     const codeActiveLine = newActiveLine ?? activeLine;
     const lineCursorPosition = cursorPosition ?? activeLineSymbol;
-    const lineLength = getActiveLineLengthArr(codeActiveLine, arrayWithCode);
-    if (activeLineSymbol === lineLength) {
-      newArray = [
-        ...arrayWithCode.slice(0, codeActiveLine + 1),
-        [''],
-        ...arrayWithCode.slice(codeActiveLine + 1),
-      ];
-    } else {
-      const { word, position } = getCurrentWord(arrayWithCode[codeActiveLine], lineCursorPosition);
-      let restLine = [''];
-      newArray = arrayWithCode.map((item, index) => {
-        if (index === codeActiveLine) {
-          const newLine = [
-            ...item.slice(0, word - 1),
-            item[word - 1].split('').slice(0, position).join(''),
-          ];
-          const firstWord = item[word - 1].split('').slice(position).join('');
-          if (firstWord) {
-            restLine = [item[word - 1].split('').slice(position).join(''), ...item.slice(word)];
-          } else {
-            restLine = [...item.slice(word)];
-          }
-          return newLine;
-        }
-        return item;
-      });
-      if (!restLine.length) {
-        restLine = [''];
-      }
-      newArray.splice(codeActiveLine + 1, 0, restLine);
-    }
+    const lineLength = getActiveLineLength(codeActiveLine, arrayWithCode);
+    const { word, position } = getCurrentWord(arrayWithCode[codeActiveLine], lineCursorPosition);
+    const newArray = addNewLineFnc(
+      arrayWithCode,
+      activeLineSymbol,
+      lineLength,
+      codeActiveLine,
+      word,
+      position
+    );
     setActiveLine(codeActiveLine + 1);
     setActiveLineSymbol(0);
     updateCode(newArray);
+    addNewUndo(newArray, codeActiveLine + 1, 0);
   };
 
   const arrowNavigation = (key: string) => {
@@ -265,7 +236,6 @@ export function Editor() {
         break;
       case 'End':
         setActiveLineSymbol(getActiveLineLength());
-
         break;
     }
   };
@@ -277,62 +247,45 @@ export function Editor() {
   const backspaceSymbol = () => {
     const lineLength = getActiveLineLength();
     const { word, position } = getCurrentWord();
+    let newLinePosition;
+    let newSymbolPosition;
+    if (lineLength === 0 && activeLine === 0) {
+      return;
+    }
     if (lineLength === 0) {
-      if (activeLine === 0) {
-        return;
-      }
       const newArray = code.filter((item, index) => index !== activeLine);
       const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
       setCode(newArray);
       setActiveLine(newActiveLine);
-      setActiveLineSymbol(getActiveLineLength(activeLine - 1));
+      newSymbolPosition = getActiveLineLength(activeLine - 1);
+      setActiveLineSymbol(newSymbolPosition);
+      addNewUndo(newArray, newActiveLine, newSymbolPosition);
     } else {
+      let newArray;
       if (activeLineSymbol !== 0) {
-        const newArray = code.map((item, index) => {
-          if (index === activeLine) {
-            const newString = [
-              ...item[word - 1].slice(0, position - 1),
-              ...item[word - 1].slice(position),
-            ].join('');
-            let newLine;
-            if (newString) {
-              newLine = [...item.slice(0, word - 1), newString, ...item.slice(word)];
-            } else if (activeLine === 0 && activeLineSymbol === 1 && getActiveLineLength() === 1) {
-              newLine = [''];
-            } else {
-              newLine = [...item.slice(0, word - 1), ...item.slice(word)];
-            }
-            setActiveLineSymbol((prevState) => prevState - 1);
-            if (newLine.length === 0) {
-              newLine = [''];
-            }
-            return newLine;
-          }
-          return item;
-        });
-        updateCode(newArray);
-      }
-      if (activeLineSymbol === 0) {
+        newArray = backspaceSymbolInMiddle(
+          code,
+          activeLine,
+          word,
+          position,
+          activeLineSymbol,
+          getActiveLineLength
+        );
+        newSymbolPosition = activeLineSymbol - 1;
+        setActiveLineSymbol((prevState) => prevState - 1);
+        newLinePosition = activeLine;
+      } else {
         if (activeLine === 0) {
           return;
         }
-        const lineToDelete = code[activeLine];
-        let newLine;
-        const wordOnEndOfPrevLine = code[activeLine - 1].at(-1);
-        if (wordOnEndOfPrevLine && wordOnEndOfPrevLine === ' ') {
-          newLine = [...code[activeLine - 1], ...lineToDelete];
-        } else {
-          newLine = [
-            ...code[activeLine - 1].slice(0, -1),
-            code[activeLine - 1][code[activeLine - 1].length - 1] + lineToDelete[0],
-            ...lineToDelete.slice(1),
-          ];
-        }
-        const newArray = [...code.slice(0, activeLine - 1), newLine, ...code.slice(activeLine + 1)];
-        setActiveLineSymbol(getActiveLineLength(activeLine - 1));
-        setActiveLine((prevState) => prevState - 1);
-        updateCode(newArray);
+        newArray = backspaceLineWithContent(code, activeLine);
+        newSymbolPosition = getActiveLineLength(activeLine - 1);
+        newLinePosition = activeLine - 1;
       }
+      setActiveLineSymbol(newSymbolPosition);
+      setActiveLine(newLinePosition);
+      updateCode(newArray);
+      addNewUndo(newArray, newLinePosition, newSymbolPosition);
     }
   };
 
@@ -342,43 +295,17 @@ export function Editor() {
     if (activeLine == code.length - 1 && activeLineSymbol == lineLength) {
       return;
     } else {
-      if (activeLineSymbol == lineLength) {
-        const newString = [...code[activeLine], ...code[activeLine + 1]];
-        const newArray = [...code.slice(0, activeLine), newString, ...code.slice(activeLine + 2)];
-        updateCode(newArray);
-      } else {
-        const line = code[activeLine];
-        const editWord = [
-          line[word - 1].slice(0, position),
-          line[word - 1].slice(position + 1),
-        ].join('');
-        let newLine;
-        if (editWord == line[word - 1]) {
-          const newString = line[word].split('').slice(1).join('');
-          if (newString === ' ') {
-            newLine = [...line.slice(0, word), ...line.slice(word + 1)];
-          }
-          newLine = [...line.slice(0, word), newString, ...line.slice(word + 1)];
-        } else {
-          newLine = [...line.slice(0, word - 1), editWord, ...line.slice(word)];
-        }
-        newLine = newLine.filter((str) => str !== '');
-        if (!newLine.length) {
-          newLine = [''];
-        }
-        const newArray = [...code.slice(0, activeLine), newLine, ...code.slice(activeLine + 1)];
-        updateCode(newArray);
-      }
+      const newArray = deleteSymbolFnc(
+        code,
+        activeLineSymbol,
+        lineLength,
+        activeLine,
+        word,
+        position
+      );
+      updateCode(newArray);
+      addNewUndo(newArray, activeLine, activeLineSymbol);
     }
-  };
-  const getWords = (text: string) => {
-    const strings = text.split(/\r?\n/);
-    const words = strings.map((st) => st.replace(/ /g, '  ').split(/\s/));
-    words.forEach(
-      (word, index, arr) =>
-        (arr[index] = word.map((elem) => (elem.length == 0 ? elem.replace('', ' ') : elem)))
-    );
-    return words;
   };
   const pasteHandler = (e: React.ClipboardEvent) => {
     const text = e.clipboardData.getData('text').trim();
@@ -388,11 +315,11 @@ export function Editor() {
     if (copyCode.length == 1 && copyCode[0] == '') {
       setCode(words);
       setActiveLine(words.length - 1);
-      setActiveLineSymbol(getActiveLineLengthArr(words.length - 1, words));
+      setActiveLineSymbol(getActiveLineLength(words.length - 1, words));
     } else if (copyCode.length - 1 == activeLine) {
       const newArr = copyCode.concat(words);
       setActiveLine(newArr.length - 1);
-      setActiveLineSymbol(getActiveLineLengthArr(newArr.length - 1, newArr));
+      setActiveLineSymbol(getActiveLineLength(newArr.length - 1, newArr));
       setCode(newArr);
     } else {
       const currString = copyCode[activeLine].join('');
@@ -412,7 +339,7 @@ export function Editor() {
       setActiveLine(activeLine + words.length - 1);
       setActiveLineSymbol(
         words.length > 1
-          ? getActiveLineLengthArr(words.length - 1, words)
+          ? getActiveLineLength(words.length - 1, words)
           : activeLineSymbol + words[0].length - 1
       );
     }
@@ -568,6 +495,7 @@ export function Editor() {
   };
   const inputEvent = async (e: React.KeyboardEvent) => {
     if (isFocus) {
+      e.preventDefault();
       if (!e.altKey && !e.ctrlKey) {
         let newArray;
         let newActiveLine;
@@ -580,6 +508,8 @@ export function Editor() {
             newCursorPosition = obj.firstLineLength;
           }
           window.getSelection()?.empty();
+        } else {
+          window.getSelection()?.removeAllRanges();
         }
         if (e.key.length === 1) {
           addNewLetter(e.key, newArray, newActiveLine, newCursorPosition);
@@ -588,7 +518,6 @@ export function Editor() {
             addNewLine(newArray, newActiveLine, newCursorPosition);
           }
           if (e.key === 'Tab') {
-            e.preventDefault();
             addNewLetter('Tab', newArray, newActiveLine, newCursorPosition);
           }
           if (e.key === 'End') {
@@ -617,6 +546,13 @@ export function Editor() {
               }
             }
           }
+        }
+      } else {
+        if (e.ctrlKey && (e.key === 'z' || e.key === 'Z')) {
+          undoRedoFnc(true);
+        }
+        if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) {
+          undoRedoFnc(false);
         }
       }
     }
