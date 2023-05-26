@@ -10,3 +10,9 @@ export interface ISelectionData {
     wordEndOffset: number;
   };
 }
+
+export interface IUndoData {
+  code: Array<Array<string>>;
+  cursorLine: number;
+  cursorSymbol: number;
+}

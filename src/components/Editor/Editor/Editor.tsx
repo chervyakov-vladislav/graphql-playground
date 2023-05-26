@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { ISelectionData } from '@/types/editorTypes';
+import { ISelectionData, IUndoData } from '@/types/editorTypes';
 import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 
 import { syntaxHighlighting } from '@/utils/syntaxHighlighting';
@@ -18,12 +18,15 @@ export function Editor() {
   const [activeTabInfo, setActiveTabInfo] = useState<ITab[]>();
   const dispatch = useAppDispatch();
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
+  const [undo, setUndo] = useState<Array<IUndoData>>();
+  const [undoOffset, setUndoOffset] = useState(0);
 
   useEffect(() => {
     const tabInfo = tabs.filter((item) => item.id == activeTabId);
     if (tabInfo.length) {
       setActiveTabInfo(tabInfo);
     }
+    setUndo(undefined);
   }, [activeTabId]);
 
   useEffect(() => {
@@ -60,6 +63,48 @@ export function Editor() {
 
   const blurEvent = () => {
     setIsFocus(false);
+  };
+
+  const addNewUndo = (
+    editedCode: Array<Array<string>>,
+    cursorLine: number,
+    cursorSymbol: number
+  ) => {
+    const obj = { code: editedCode, cursorLine, cursorSymbol };
+    if (undo?.length) {
+      let undoArr: IUndoData[] | undefined;
+      if (undoOffset) {
+        undoArr = undo.slice(0, undo.length - undoOffset);
+        setUndoOffset(0);
+      }
+      const result = undoArr ?? undo;
+      if (result.length === 10) {
+        setUndo([...result.slice(1), obj]);
+      } else {
+        setUndo([...result, obj]);
+      }
+    } else {
+      setUndo([{ code, cursorSymbol: activeLineSymbol, cursorLine: activeLine }, obj]);
+    }
+  };
+
+  const undoRedoFnc = (isUndo: boolean) => {
+    if (undo && undo.length) {
+      let obj;
+      if (isUndo) {
+        obj = undo[undo.length - 1 - undoOffset - 1];
+      } else {
+        obj = undo[undo.length - 1 - undoOffset + 1];
+      }
+      if (obj) {
+        setCode(obj.code);
+        setActiveLine(obj.cursorLine);
+        setActiveLineSymbol(obj.cursorSymbol);
+        isUndo
+          ? setUndoOffset((prevState) => prevState + 1)
+          : setUndoOffset((prevState) => prevState - 1);
+      }
+    }
   };
 
   const clickNavigation = (e: React.MouseEvent) => {
@@ -135,12 +180,15 @@ export function Editor() {
     const lineCursorPosition = cursorPosition ?? activeLineSymbol;
     const { word, position } = getCurrentWord(arrayWithCode[codeActiveLine], lineCursorPosition);
     const newCodeArray = addNewLetterFnc(arrayWithCode, codeActiveLine, word, position, letter);
+    let newSymbolPosition;
     if (letter === 'Tab') {
-      setActiveLineSymbol(lineCursorPosition + 2);
+      newSymbolPosition = lineCursorPosition + 2;
     } else {
-      setActiveLineSymbol(lineCursorPosition + 1);
+      newSymbolPosition = lineCursorPosition + 1;
     }
+    setActiveLineSymbol(newSymbolPosition);
     updateCode(newCodeArray);
+    addNewUndo(newCodeArray, codeActiveLine, newSymbolPosition);
   };
 
   const addNewLine = (
@@ -164,6 +212,7 @@ export function Editor() {
     setActiveLine(codeActiveLine + 1);
     setActiveLineSymbol(0);
     updateCode(newArray);
+    addNewUndo(newArray, codeActiveLine + 1, 0);
   };
 
   const arrowNavigation = (key: string) => {
@@ -198,6 +247,8 @@ export function Editor() {
   const backspaceSymbol = () => {
     const lineLength = getActiveLineLength();
     const { word, position } = getCurrentWord();
+    let newLinePosition;
+    let newSymbolPosition;
     if (lineLength === 0 && activeLine === 0) {
       return;
     }
@@ -206,7 +257,9 @@ export function Editor() {
       const newActiveLine = activeLine - 1 >= 0 ? activeLine - 1 : activeLine;
       setCode(newArray);
       setActiveLine(newActiveLine);
-      setActiveLineSymbol(getActiveLineLength(activeLine - 1));
+      newSymbolPosition = getActiveLineLength(activeLine - 1);
+      setActiveLineSymbol(newSymbolPosition);
+      addNewUndo(newArray, newActiveLine, newSymbolPosition);
     } else {
       let newArray;
       if (activeLineSymbol !== 0) {
@@ -218,16 +271,21 @@ export function Editor() {
           activeLineSymbol,
           getActiveLineLength
         );
+        newSymbolPosition = activeLineSymbol - 1;
         setActiveLineSymbol((prevState) => prevState - 1);
+        newLinePosition = activeLine;
       } else {
         if (activeLine === 0) {
           return;
         }
         newArray = backspaceLineWithContent(code, activeLine);
-        setActiveLineSymbol(getActiveLineLength(activeLine - 1));
-        setActiveLine((prevState) => prevState - 1);
+        newSymbolPosition = getActiveLineLength(activeLine - 1);
+        newLinePosition = activeLine - 1;
       }
+      setActiveLineSymbol(newSymbolPosition);
+      setActiveLine(newLinePosition);
       updateCode(newArray);
+      addNewUndo(newArray, newLinePosition, newSymbolPosition);
     }
   };
 
@@ -246,6 +304,7 @@ export function Editor() {
         position
       );
       updateCode(newArray);
+      addNewUndo(newArray, activeLine, activeLineSymbol);
     }
   };
   const pasteHandler = (e: React.ClipboardEvent) => {
@@ -487,6 +546,13 @@ export function Editor() {
               }
             }
           }
+        }
+      } else {
+        if (e.ctrlKey && (e.key === 'z' || e.key === 'Z')) {
+          undoRedoFnc(true);
+        }
+        if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) {
+          undoRedoFnc(false);
         }
       }
     }
