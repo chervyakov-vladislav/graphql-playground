@@ -502,12 +502,14 @@ export function Editor() {
     }
     editorClickEvent();
   };
-  const handleMobile = (e) => {
-    const key = e.which || e.keyCode;
-    if (isNaN(e.target.value.charCodeAt(0)) || key == 8) {
+  const handleMobile = (e: unknown) => {
+    const keyEvent = e as React.KeyboardEvent;
+    const valueEvent = e as React.ChangeEvent<HTMLInputElement>;
+    const key = keyEvent.which || keyEvent.keyCode;
+    if (isNaN(valueEvent.target.value.charCodeAt(0)) || key == 8) {
       backspaceSymbol();
     } else {
-      const letter = e.target.value.substr(-1);
+      const letter = valueEvent.target.value.substr(-1);
 
       addNewLetter(letter);
     }
