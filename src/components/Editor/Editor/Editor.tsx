@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { ISelectionData, IUndoData } from '@/types/editorTypes';
 import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
+import { isMobile } from 'react-device-detect';
 
 import { syntaxHighlighting } from '@/utils/syntaxHighlighting';
 import {
@@ -20,6 +21,7 @@ export function Editor() {
   const [code, setCode] = useState<Array<Array<string>>>([['']]);
   const [undo, setUndo] = useState<Array<IUndoData>>();
   const [undoOffset, setUndoOffset] = useState(0);
+  const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const tabInfo = tabs.filter((item) => item.id == activeTabId);
@@ -62,7 +64,7 @@ export function Editor() {
   };
 
   const blurEvent = () => {
-    setIsFocus(false);
+    // setIsFocus(false);
   };
 
   const addNewUndo = (
@@ -109,6 +111,13 @@ export function Editor() {
 
   const clickNavigation = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isMobile) {
+      if (ref.current) {
+        ref.current.value = '';
+        ref.current.focus();
+      }
+    }
+
     const line = e.currentTarget.getAttribute('data-line');
     const target = e.target as HTMLElement;
     const word = Number(target?.getAttribute('data-letter'));
@@ -493,6 +502,17 @@ export function Editor() {
     }
     editorClickEvent();
   };
+  const handleMobile = (e) => {
+    const key = e.which || e.keyCode;
+    if (isNaN(e.target.value.charCodeAt(0)) || key == 8) {
+      backspaceSymbol();
+    } else {
+      const letter = e.target.value.substr(-1);
+
+      addNewLetter(letter);
+    }
+    if (ref.current) ref.current.value = '';
+  };
   const inputEvent = async (e: React.KeyboardEvent) => {
     if (isFocus) {
       e.preventDefault();
@@ -573,12 +593,13 @@ export function Editor() {
       </div>
       <div
         tabIndex={0}
-        className="text-black max-w-full  h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
+        className="text-black caret-transparent max-w-full  h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
         onFocus={focusEvent}
         onBlur={blurEvent}
         onKeyDown={inputEvent}
         onMouseUpCapture={mouseUpHandler}
         onPaste={pasteHandler}
+        // contentEditable="true"
       >
         {code.map((item, index) => (
           <div
@@ -599,6 +620,7 @@ export function Editor() {
             ))}
           </div>
         ))}
+
         <div
           className={`absolute h-[24px] w-[2px] bg-black select-none animate-blink-cursor ${
             isFocus ? 'visible' : 'hidden'
@@ -606,6 +628,8 @@ export function Editor() {
           style={{ top: `${height}px`, left: `${left}px` }}
         />
       </div>
+
+      {isMobile && <input ref={ref} onKeyUp={handleMobile} className={'w-0 opacity-0'} />}
     </div>
   );
 }
