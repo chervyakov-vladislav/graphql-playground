@@ -10,7 +10,7 @@ export function EditorContainer() {
     <div className="pt-12">
       <TabsContainer />
       <Grid
-        className="pl-4"
+        className="2xl:pl-4"
         container
         direction="row"
         justifyContent="center"
@@ -18,8 +18,8 @@ export function EditorContainer() {
         spacing={1}
       >
         <Grid item md={6} xs={12}>
-          <div className="flex mt-[10px] h-[75vh] grow bg-white rounded-lg flex-col justify-between">
-            <div className="p-8 ">
+          <div className="flex mt-[10px] h-[75vh] grow bg-white  rounded-lg flex-col justify-between relative">
+            <div className="p-8 overflow-auto ">
               <EditorHeader />
               <Editor />
             </div>

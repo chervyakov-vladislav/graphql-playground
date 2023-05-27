@@ -38,11 +38,11 @@ const Form = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col items-center mt-9">
+    <form onSubmit={handleSubmit} className="flex flex-col 2xl:items-center mt-9">
       <TextField
         value={value}
         variant="standard"
-        className="font-SourceSansPro text-[1rem] max-w-sm w-full flex-1"
+        className="font-SourceSansPro text-[1rem]  w-full flex-1"
         size="small"
         onChange={handleChange}
       />
