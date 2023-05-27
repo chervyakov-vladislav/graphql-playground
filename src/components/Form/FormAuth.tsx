@@ -63,4 +63,5 @@ const FormAuth = () => {
     </>
   );
 };
+
 export default FormAuth;

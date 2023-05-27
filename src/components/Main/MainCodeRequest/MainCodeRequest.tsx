@@ -11,7 +11,7 @@ export const MainCodeRequest = () => {
       </div>
       <div>
         &nbsp;&nbsp;&nbsp;&nbsp;teamMembers(team:{' '}
-        <span className={'text-color-text-orange'}>$team:</span>) &#123;
+        <span className={'text-color-text-orange'}>$team</span>) &#123;
       </div>
       <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name</div>
       <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;github_nickname</div>

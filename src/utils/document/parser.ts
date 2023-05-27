@@ -7,7 +7,6 @@ import { OfType, getType } from './getType';
 
 export const parser = (currentType: string, data: IntrospectionQuery) => {
   const newType = data.__schema.types.find(({ name }) => name === currentType) as IntrospectionType;
-  console.log(data.__schema);
 
   switch (newType.kind) {
     case 'OBJECT':

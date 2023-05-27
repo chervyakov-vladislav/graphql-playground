@@ -5,7 +5,7 @@ import { Editor } from '@/components/Editor/Editor/Editor';
 import EditorVars from '../EditorVars/EditorVars';
 import { ResponseBlock } from '@/components/ResponseBlock/ResponseBlock';
 
-export function EditorContainer() {
+const EditorContainer = () => {
   return (
     <div className="pt-12">
       <TabsContainer />
@@ -32,4 +32,6 @@ export function EditorContainer() {
       </Grid>
     </div>
   );
-}
+};
+
+export default EditorContainer;

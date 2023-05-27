@@ -26,7 +26,6 @@ const Fields = () => {
   }
 
   const handleClick = (kind: string, typeName: string) => {
-    console.log(kind, typeName);
     if (kind === 'OBJECT') {
       dispatch(setCurrentType(typeName));
     }
