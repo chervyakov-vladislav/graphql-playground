@@ -90,7 +90,7 @@ export const Response = () => {
       {response && response.length && (
         <div className="relative">
           <ResponseButtons response={response} />
-          <pre className="break-all font-SourceCodePro whitespace-pre-wrap h-[60vh] overflow-auto text-sm">
+          <pre className="break-all font-SourceCodePro whitespace-pre-wrap max-h-[60vh] overflow-auto text-sm">
             {response ? response : ''}
           </pre>
         </div>

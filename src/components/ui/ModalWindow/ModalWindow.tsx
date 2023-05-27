@@ -13,7 +13,7 @@ export function ModalWindow(props: IProps) {
   return (
     <div
       className={
-        'fixed top-0 left-0 z-10 w-full h-full bg-black bg-opacity-50 flex justify-center items-center cursor-pointer'
+        'fixed top-0 z-20 p-2 left-0 z-10 w-full h-full bg-black bg-opacity-50 flex justify-center items-center cursor-pointer'
       }
       onClick={props.closeModalFnc}
     >

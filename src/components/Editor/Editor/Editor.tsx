@@ -558,7 +558,7 @@ export function Editor() {
     }
   };
   return (
-    <div className="flex overflow-auto">
+    <div className="flex pt-8 min-h-[50vh]">
       <div className="text-black pr-3">
         {code.map((item, index) => (
           <div

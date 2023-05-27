@@ -31,7 +31,7 @@ export function CreateTabForm(props: IProps) {
   return (
     <form
       onSubmit={handleSubmit(submitHandler)}
-      className={'mx-auto flex flex-col justify-center items-center m-5'}
+      className={'mx-auto flex flex-col justify-center items-center md:m-5'}
     >
       <h2 className={'font-SourceSansPro text-xl text-color-documentation-primary m-0 mb-2.5'}>
         {t('graphql_page.add_tab.enter_tab')}

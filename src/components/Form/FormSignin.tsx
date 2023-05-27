@@ -22,7 +22,10 @@ const FormSignin = ({ onSubmit }: Props) => {
   const validationSchem = yup.object({
     email: yup
       .string()
-      .email(t('auth_page.validations.email_valid') as yup.Message<{ regex: RegExp }>)
+      .matches(
+        /^(([^<>()\[\]\\.,;:\s@"]+(.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))$/,
+        t('auth_page.validations.email_valid') as yup.Message<{ regex: RegExp }>
+      )
       .required(t('auth_page.validations.email_required') as yup.Message<{ regex: RegExp }>),
     password: yup
       .string()
@@ -71,7 +74,7 @@ const FormSignin = ({ onSubmit }: Props) => {
     <form onSubmit={methods.handleSubmit(formSubmit)}>
       <FormProvider {...methods}>
         <Stack spacing={2}>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
             <h2 className="font-semibold text-xl">{t('auth_page.title_sign_in')}</h2>
             <p className="text-xs">
               {t('auth_page.already_question')}{' '}

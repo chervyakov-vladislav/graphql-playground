@@ -27,7 +27,7 @@ const InfoBlock = () => {
   ) : (
     <>
       {isSuccess ? (
-        <div className="mt-3 ml-auto mr-auto max-w-sm w-full 2xl:ml-0 2xl:mr-0 overflow-auto h-[60vh]">
+        <div className="mt-3 ml-auto mr-auto  w-full 2xl:ml-0 2xl:mr-0 overflow-auto">
           <Root />
           <BackButton />
           <Fields />
