@@ -18,8 +18,8 @@ export function EditorContainer() {
         spacing={1}
       >
         <Grid item md={6} xs={12}>
-          <div className="flex mt-[10px] h-[75vh] grow bg-white  rounded-lg flex-col justify-between relative">
-            <div className="p-8 overflow-auto ">
+          <div className="flex mt-[10px] md:h-[75vh] grow bg-white  rounded-lg flex-col justify-between relative">
+            <div className="p-2 md:p-8 overflow-auto ">
               <EditorHeader />
               <Editor />
             </div>

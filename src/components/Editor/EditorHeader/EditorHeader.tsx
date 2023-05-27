@@ -32,7 +32,7 @@ export const EditorHeader = () => {
     }
   };
   return (
-    <div className="flex font-SourceSansPro justify-between bg-white z-10 pt-8 pb-2 select-none absolute top-0 w-11/12">
+    <div className="flex font-SourceSansPro justify-between bg-white z-10 pt-2 md:pt-8 pb-2 select-none absolute top-0 w-11/12">
       <h3 className="text-black m-0 p-0">{t('graphql_page.editor.operation')}</h3>
       <Button
         sx={{
