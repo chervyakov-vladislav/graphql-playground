@@ -37,7 +37,7 @@ const Fields = () => {
         <Typography
           fontFamily={'Source Sans Pro'}
           component="h4"
-          className="flex items-center text-base font-semibold"
+          className="flex text-color-documentation-primary items-center text-base font-semibold"
         >
           Fields
         </Typography>
