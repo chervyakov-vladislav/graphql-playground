@@ -143,7 +143,7 @@ export function Editor() {
         setActiveLineSymbol(getActiveLineLength(Number(line)));
       }
     }
-    if (!window.getSelection()?.isCollapsed) {
+    if (!window.getSelection()?.isCollapsed && window.getSelection()?.type !== 'None') {
       window.getSelection()?.removeAllRanges();
     }
   };
@@ -385,8 +385,8 @@ export function Editor() {
 
   const getEndPartOfLine = (line: Array<string>, start: number, offset: number) => {
     let currentLine = start;
-    if (!line[start]) {
-      while (!line[start]) {
+    if (!line.at(currentLine)) {
+      while (!line.at(currentLine)) {
         currentLine -= 1;
       }
     }
@@ -525,7 +525,6 @@ export function Editor() {
   };
   const inputEvent = async (e: React.KeyboardEvent) => {
     if (isFocus) {
-      e.preventDefault();
       if (!e.altKey && !e.ctrlKey) {
         let newArray;
         let newActiveLine;
@@ -544,6 +543,7 @@ export function Editor() {
         if (e.key.length === 1) {
           addNewLetter(e.key, newArray, newActiveLine, newCursorPosition);
         } else {
+          e.preventDefault();
           if (e.key === 'Enter') {
             addNewLine(newArray, newActiveLine, newCursorPosition);
           }
@@ -578,10 +578,10 @@ export function Editor() {
           }
         }
       } else {
-        if (e.ctrlKey && (e.key === 'z' || e.key === 'Z')) {
+        if (e.ctrlKey && (e.key === 'z' || e.key === 'Z' || e.key === 'я' || e.key === 'Я')) {
           undoRedoFnc(true);
         }
-        if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) {
+        if (e.ctrlKey && (e.key === 'y' || e.key === 'Y' || e.key === 'н' || e.key === 'Н')) {
           undoRedoFnc(false);
         }
       }
