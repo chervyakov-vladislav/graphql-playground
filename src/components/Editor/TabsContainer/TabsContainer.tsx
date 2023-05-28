@@ -1,9 +1,9 @@
 import EditorTab from '@/components/ui/EditorTab/EditorTab';
 import { AddTabButton } from '@/components/Editor/AddTabButton/AddTabButton';
 import React, { useState } from 'react';
-import { useAppSelector } from '@/hooks/redux';
 import { ModalWindow } from '@/components/ui/ModalWindow/ModalWindow';
 import { CreateTabForm } from '@/components/ui/CreateTabForm/CreateTabForm';
+import { useAppSelector } from '@/store/hooks';
 
 export const TabsContainer = () => {
   const { tabs } = useAppSelector((state) => state.editorTab);

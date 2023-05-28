@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { useGetDataMutation } from '@/store/api';
-import { useAppSelector } from '@/hooks/redux';
 import { convertBytes, millisecondsInSec } from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hooks';
 
 interface IResponseData {
   time: number;
