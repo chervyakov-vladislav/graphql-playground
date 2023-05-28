@@ -23,7 +23,7 @@ const FormSignin = ({ onSubmit }: Props) => {
     email: yup
       .string()
       .matches(
-        /^(([^<>()\[\]\\.,;:\s@"]+(.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))$/,
+        /[a-zA-Z_\d\.-]+@[a-zA-Z_\-]+(\.[a-zA-Z]{2,}){1,6}/,
         t('auth_page.validations.email_valid') as yup.Message<{ regex: RegExp }>
       )
       .required(t('auth_page.validations.email_required') as yup.Message<{ regex: RegExp }>),
@@ -38,7 +38,7 @@ const FormSignin = ({ onSubmit }: Props) => {
         t('auth_page.validations.password_one_uppercase') as yup.Message<{ regex: RegExp }>
       )
       .matches(
-        /^(?=.*[a-zа-я])(?=.*[A-ZА-Я])(?=.*\d)(?=.*[^\da-zA-Zа-яА-Я\s])(?!.*\s).{8,}$/,
+        /[^\w\s]|_/,
         t('auth_page.validations.password_one_special') as yup.Message<{ regex: RegExp }>
       )
       .min(8, t('auth_page.validations.password_8_length') as yup.Message<{ min: number }>)

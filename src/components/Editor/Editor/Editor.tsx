@@ -125,7 +125,7 @@ export function Editor() {
     if (line) {
       setActiveLine(Number(line));
     }
-    if (word) {
+    if (word >= 0) {
       let lineLength = 0;
       for (let i = 0; i < word; i++) {
         if (Number(line) >= 0) {

@@ -25,7 +25,7 @@ const FormLogin = ({ onSubmit }: Props) => {
     email: yup
       .string()
       .matches(
-        /^(([^<>()\[\]\\.,;:\s@"]+(.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))$/,
+        /[a-zA-Z_\d\.-]+@[a-zA-Z_\-]+(\.[a-zA-Z]{2,}){1,6}/,
         t('auth_page.validations.email_valid') as yup.Message<{ regex: RegExp }>
       )
       .required(t('auth_page.validations.email_required') as yup.Message<{ regex: RegExp }>),

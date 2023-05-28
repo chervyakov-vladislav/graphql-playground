@@ -19,7 +19,7 @@ const EditorContainer = () => {
       >
         <Grid item md={6} xs={12}>
           <div className="flex mt-[10px] md:h-[75vh] grow bg-white  rounded-lg flex-col justify-between relative">
-            <div className="p-2 md:p-8 overflow-auto ">
+            <div className="p-2 md:p-8 md:pr-0 md:pl-0 border-r-[30px] border-l-[30px] border-solid border-white overflow-auto ">
               <EditorHeader />
               <Editor />
             </div>
