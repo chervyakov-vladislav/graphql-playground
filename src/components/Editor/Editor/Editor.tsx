@@ -64,7 +64,7 @@ export function Editor() {
   };
 
   const blurEvent = () => {
-    // setIsFocus(false);
+    setIsFocus(false);
   };
 
   const addNewUndo = (
@@ -600,7 +600,6 @@ export function Editor() {
         onKeyDown={inputEvent}
         onMouseUpCapture={mouseUpHandler}
         onPaste={pasteHandler}
-        // contentEditable="true"
       >
         {code.map((item, index) => (
           <div
