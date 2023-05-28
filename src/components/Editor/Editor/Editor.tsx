@@ -143,6 +143,9 @@ export function Editor() {
         setActiveLineSymbol(getActiveLineLength(Number(line)));
       }
     }
+    if (!window.getSelection()?.isCollapsed) {
+      window.getSelection()?.removeAllRanges();
+    }
   };
 
   const editorClickEvent = () => {
@@ -381,7 +384,13 @@ export function Editor() {
   };
 
   const getEndPartOfLine = (line: Array<string>, start: number, offset: number) => {
-    return [line[start].split('').slice(offset).join(''), ...line.slice(start + 1)];
+    let currentLine = start;
+    if (!line[start]) {
+      while (!line[start]) {
+        currentLine -= 1;
+      }
+    }
+    return [line[currentLine].split('').slice(offset).join(''), ...line.slice(currentLine + 1)];
   };
 
   const deleteSelectedText = () => {
@@ -579,8 +588,8 @@ export function Editor() {
     }
   };
   return (
-    <div className="flex pt-8 min-h-[50vh]">
-      <div className="text-black pr-3">
+    <div className="flex pt-8 min-h-[50vh]" onMouseUpCapture={mouseUpHandler}>
+      <div className="text-black pr-3 select-none">
         {code.map((item, index) => (
           <div
             key={index + 10}
@@ -594,11 +603,10 @@ export function Editor() {
       </div>
       <div
         tabIndex={0}
-        className="text-black caret-transparent max-w-full  h-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
+        className="text-black caret-transparent max-w-full grow relative font-SourceCodePro leading-5 outline-0 cursor-text"
         onFocus={focusEvent}
         onBlur={blurEvent}
         onKeyDown={inputEvent}
-        onMouseUpCapture={mouseUpHandler}
         onPaste={pasteHandler}
       >
         {code.map((item, index) => (
