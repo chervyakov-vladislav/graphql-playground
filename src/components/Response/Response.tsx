@@ -1,11 +1,10 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectEditor } from '@/store/reducers/editor/slice';
 import { useGetDataMutation } from '@/store/api';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
 import { IResponse, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 import { isFetchBaseQueryError } from '@/utils/helpers';
 import { ResponseButtons } from '@/components/Response/ResponseButtons/ResponseButtons';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 export const Response = () => {
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);

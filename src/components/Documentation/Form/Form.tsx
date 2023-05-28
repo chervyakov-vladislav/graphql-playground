@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { TextField, Button } from '@mui/material';
 
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   selectDocument,
   setFirstLoad,
@@ -10,6 +9,7 @@ import {
 } from '@/store/reducers/document/slice';
 import { useGetDataMutation } from '@/store/api';
 import { getIntrospectionQuery } from '@/queries/introspectionQuery';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const Form = () => {
   const { link, firstLoad } = useAppSelector(selectDocument);

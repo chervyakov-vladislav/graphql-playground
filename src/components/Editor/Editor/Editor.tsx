@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { ISelectionData, IUndoData } from '@/types/editorTypes';
 import { ITab, updateActiveTab } from '@/store/reducers/editorTabs/slice';
 import { isMobile } from 'react-device-detect';
@@ -13,6 +12,7 @@ import {
   deleteSymbolFnc,
   getWords,
 } from '@/utils/editorHelpers';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 export function Editor() {
   const { activeTabId, tabs } = useAppSelector((state) => state.editorTab);
@@ -494,10 +494,10 @@ export function Editor() {
             );
           }
         } else {
-          console.log('Only click');
+          // console.log('Only click');
         }
       } else {
-        console.log('Selection not found');
+        // console.log('Selection not found');
       }
     }
     editorClickEvent();

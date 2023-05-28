@@ -1,8 +1,8 @@
 import { Button, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { useAppDispatch } from '@/hooks/redux';
 import { editorTabSlice } from '@/store/reducers/editorTabs/slice';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch } from '@/store/hooks';
 
 type tabNameForm = {
   tabName: string;

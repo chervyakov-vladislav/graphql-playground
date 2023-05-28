@@ -1,7 +1,7 @@
 import React from 'react';
 import ClearIcon from '@mui/icons-material/Clear';
 import { editorTabSlice } from '@/store/reducers/editorTabs/slice';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 interface IProps {
   name: string;

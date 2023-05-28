@@ -11,7 +11,7 @@ import Fields from './Fields/Fields';
 import BackButton from './BackButton/BackButton';
 
 const InfoBlock = () => {
-  const [getData, { data, isSuccess, isLoading }] = useGetDataMutation({
+  const [getResp, { data, isSuccess, isLoading }] = useGetDataMutation({
     fixedCacheKey: 'Introspection',
   });
   const dispatch = useAppDispatch();

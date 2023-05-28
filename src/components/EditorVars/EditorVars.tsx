@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setHeads, setVars } from '@/store/reducers/editorTabs/slice';
 import { Accordion, AccordionDetails, AccordionSummary, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
