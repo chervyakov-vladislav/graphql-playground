@@ -1,0 +1,83 @@
+{
+  "404": {
+    "oops": "Ooops... Something went wrong",
+    "not-found": "Page not found"
+  },
+  "header": {
+    "login": "Log in",
+    "signin": "Sign in",
+    "logout": "Log out"
+  },
+  "footer": {
+    "team": [
+      {
+        "name": "Asmeev Daniil"
+      },
+      {
+        "name": "Chervyakov Vladislav"
+      },
+      {
+        "name": "Makarova Polina"
+      }
+    ]
+  },
+  "welcome_page": {
+    "ask_for": "Ask for what you want",
+    "get_results": "Get predictable results",
+    "form": {
+      "welcome": "Welcome!",
+      "desc": "To start using the service, please log in with your account",
+      "desc_authed": "To start using the service, please go to the editor",
+      "editor_btn": "Go to editor",
+      "login": "Log in",
+      "signin": "Sign in"
+    }
+  },
+  "auth_page": {
+    "title_sign_in": "Sign in",
+    "title_log_in": "Log in",
+    "already_question": "Already have an account?",
+    "already_link": "Let's log in",
+    "sign_in_btn": "Sign in",
+    "log_in_btn": "Log in",
+    "new_user_question": "New user?",
+    "new_user_link": "Let's sign in",
+    "validations": {
+      "email_valid": "Enter a valid email",
+      "email_required": "Email is required",
+      "password_required": "Password is required",
+      "password_one_number": "Password must contain at least one number",
+      "password_one_uppercase": "Password must contain at least one uppercase letter",
+      "password_one_special": "Password must contain at least one special symbol",
+      "password_8_length": "Password should be of minimum 8 characters length",
+      "password_must_much": "Password must much",
+      "password_repeat": "Repeat password"
+    },
+    "placeholders": {
+      "email": "Email Address",
+      "pass": "Password",
+      "repeat_pass": "Repeat password"
+    },
+    "error": "Error"
+  },
+  "graphql_page": {
+    "docs": {
+      "title": "Documentation",
+      "error": "Wrong link"
+    },
+    "request": "Operation",
+    "response": "Response",
+    "editor": {
+      "operation": "Operation",
+      "response": "Response",
+      "status": "STATUS"
+    },
+    "add_tab": {
+      "enter_tab": "Enter tab name",
+      "add_tab": "Add tab",
+      "tab_name": "Tab name"
+    },
+    "variables": "Variables",
+    "headers": "Headers"
+  }
+}
